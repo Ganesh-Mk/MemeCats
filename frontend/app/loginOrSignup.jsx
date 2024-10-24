@@ -1,33 +1,32 @@
-// app/index.jsx
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 import Colors from "../constants/Colors";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 
-const LoginScreen = () => {
+const LoginOrSignupScreen = () => {
   return (
-    <View style={styles.loginScreen}>
+    <View style={styles.screen}>
       <Image
-        source={require("../assets/gif/happyCat.gif")}
+        source={require("../assets/gif/huhCat.gif")}
         style={styles.image}
       />
-      <Text style={styles.welcomeText}>Welcome, Hooman!</Text>
-      <Text style={styles.subText}>
-        Get ready for a pawsome ride through the funniest, sassiest cat memes
-        ever
-      </Text>
-      <Link href="./loginOrSignup" style={styles.btnBox}>
-        <Text style={styles.btnText}>Let's Get Started 😻</Text>
+
+      <Link href="./signup" style={styles.btnBox}>
+        <Text style={styles.btnText}>Meow Up</Text>
+      </Link>
+      <Text style={styles.subText}>OR</Text>
+      <Link href="./login" style={styles.btnBox}>
+        <Text style={styles.btnText}>Meow In</Text>
       </Link>
     </View>
   );
 };
 
-export default LoginScreen;
+export default LoginOrSignupScreen;
 
 const styles = StyleSheet.create({
-  loginScreen: {
+  screen: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -35,23 +34,22 @@ const styles = StyleSheet.create({
     height: "100%",
     padding: "2rem",
   },
-  welcomeText: {
-    fontSize: 50,
-    fontFamily: "Bold",
-    textAlign: "center",
-  },
+
   subText: {
     fontSize: 20,
     fontFamily: "Regular",
     textAlign: "center",
-    marginTop: 20,
+    marginVertical: 20,
     color: Colors.black,
   },
   image: {
     width: 320,
     height: 320,
     color: Colors.black,
+    marginBottom: 40,
+    marginLeft: 30,
   },
+
   btnBox: {
     backgroundColor: Colors.red,
     paddingLeft: 30,
@@ -59,7 +57,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     borderRadius: 10,
-    marginTop: 50,
+    width: 300,
+    textAlign: "center",
   },
   btnText: {
     fontFamily: "Bold",
