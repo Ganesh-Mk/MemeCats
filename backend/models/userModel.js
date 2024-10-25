@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const reelSchema = require("./reelsMode");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -19,9 +18,15 @@ const userSchema = new mongoose.Schema({
   },
   profileImage: {
     type: String,
+    default:
+      "https://static-00.iconduck.com/assets.00/cat-symbol-icon-256x256-jqp15brc.png",
   },
-  reels: [reelSchema],
+  reels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reel",
+    },
+  ],
 });
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);

@@ -6,7 +6,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("reels");
 
     if (user) {
       if (user.password === password) {

@@ -10,6 +10,24 @@ app.use(express.json());
 
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
+const editProfileRouter = require("./routes/editProfile");
+const deleteUserRouter = require("./routes/deleteUser");
+const createReelRouter = require("./routes/createReel");
+const getAllReelsRouter = require("./routes/getAllReels");
+const getReelRouter = require("./routes/getReel");
+const deleteReelRouter = require("./routes/deleteReel");
+const editReelRouter = require("./routes/editReel");
+
+app.use(signupRouter);
+app.use(loginRouter);
+app.use(editProfileRouter);
+app.use(deleteUserRouter);
+app.use(createReelRouter);
+app.use(getAllReelsRouter);
+app.use(getReelRouter);
+app.use(deleteReelRouter);
+app.use(editReelRouter);
+
 const User = require("./models/userModel");
 
 mongoose
@@ -18,12 +36,22 @@ mongoose
   .catch((err) => console.error("Database Connection Failed: ", err));
 
 app.get("/", async (req, res) => {
-  const users = await User.find();
+  const users = await User.find().populate("reels");
   res.json(users);
 });
 
+app.get("/getAllReels", getAllReelsRouter);
+app.get("/getReel", getReelRouter);
+
 app.post("/signup", signupRouter);
 app.post("/login", loginRouter);
+app.post("/createReel", createReelRouter);
+
+app.patch("/editProfile", editProfileRouter);
+app.patch("/editReel", editReelRouter);
+
+app.delete("/deleteUser", deleteUserRouter);
+app.delete("/deleteReel", deleteReelRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
