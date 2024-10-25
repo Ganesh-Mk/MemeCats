@@ -1,9 +1,7 @@
-// app/index.jsx
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
-
 import Colors from "../constants/Colors";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 
 const LoginScreen = () => {
   return (

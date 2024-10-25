@@ -24,10 +24,7 @@ const SignupScreen = () => {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
-      >
+      <KeyboardAvoidingView style={styles.keyboardAvoidingView}>
         <View style={styles.imageContainer}>
           <Image source={images[focusedField]} style={styles.image} />
         </View>
@@ -58,7 +55,7 @@ const SignupScreen = () => {
           onFocus={() => setFocusedField("password")}
         />
 
-        <Link href="./login" style={styles.btnBox}>
+        <Link href="./(tabs)" style={styles.btnBox}>
           <Text style={styles.btnText}>Submit Meow!</Text>
         </Link>
       </KeyboardAvoidingView>

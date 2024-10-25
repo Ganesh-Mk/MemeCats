@@ -50,7 +50,7 @@ const Screen = () => {
           onFocus={() => setFocusedField("password")}
         />
 
-        <Link href="./tabs" style={styles.btnBox}>
+        <Link href="./(tabs)" style={styles.btnBox}>
           <Text style={styles.btnText}>Submit Meow!</Text>
         </Link>
       </KeyboardAvoidingView>

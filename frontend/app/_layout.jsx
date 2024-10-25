@@ -1,4 +1,3 @@
-// app/_layout.jsx
 import React from "react";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -12,11 +11,11 @@ const RootLayout = () => {
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: true }} />
-      <Stack.Screen name="loginOrSignup" options={{ headerShown: true }} />
-      <Stack.Screen name="signup" options={{ headerShown: true }} />
-      <Stack.Screen name="login" options={{ headerShown: true }} />
-      <Stack.Screen name="tabs" options={{ headerShown: false }} />
+      <Stack.Screen name="index" />
+      <Stack.Screen name="loginOrSignup" />
+      <Stack.Screen name="signup" />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
 };
