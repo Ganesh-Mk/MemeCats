@@ -7,10 +7,12 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "../constants/Colors";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 
 const images = {
   login: require("../assets/gif/kissCat.gif"),
@@ -20,6 +22,34 @@ const images = {
 
 const Screen = () => {
   const [focusedField, setFocusedField] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState("");
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        router.push("./(tabs)");
+        console.log(data.user);
+      } else {
+        console.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -40,6 +70,7 @@ const Screen = () => {
           style={styles.input}
           keyboardType="email-address"
           onFocus={() => setFocusedField("email")}
+          onChangeText={setEmail}
         />
 
         <TextInput
@@ -48,11 +79,16 @@ const Screen = () => {
           style={styles.input}
           secureTextEntry
           onFocus={() => setFocusedField("password")}
+          onChangeText={setPassword}
         />
 
-        <Link href="./(tabs)" style={styles.btnBox}>
-          <Text style={styles.btnText}>Submit Meow!</Text>
-        </Link>
+        <TouchableOpacity style={styles.btnBox} onPress={handleSubmit}>
+          {loading ? (
+            <ActivityIndicator color={Colors.white} />
+          ) : (
+            <Text style={styles.btnText}>Submit Meow!</Text>
+          )}
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

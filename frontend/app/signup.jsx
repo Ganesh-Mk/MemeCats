@@ -6,11 +6,12 @@ import {
   View,
   SafeAreaView,
   KeyboardAvoidingView,
-  Platform,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "../constants/Colors";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 
 const images = {
   signup: require("../assets/gif/dancingCat.gif"),
@@ -21,6 +22,35 @@ const images = {
 
 const SignupScreen = () => {
   const [focusedField, setFocusedField] = useState("signup");
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        router.push("./(tabs)");
+      } else {
+        console.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -37,6 +67,7 @@ const SignupScreen = () => {
           placeholderTextColor={Colors.gray}
           style={styles.input}
           onFocus={() => setFocusedField("name")}
+          onChangeText={setName}
         />
 
         <TextInput
@@ -45,6 +76,7 @@ const SignupScreen = () => {
           style={styles.input}
           keyboardType="email-address"
           onFocus={() => setFocusedField("email")}
+          onChangeText={setEmail}
         />
 
         <TextInput
@@ -53,11 +85,20 @@ const SignupScreen = () => {
           style={styles.input}
           secureTextEntry
           onFocus={() => setFocusedField("password")}
+          onChangeText={setPassword}
         />
 
-        <Link href="./(tabs)" style={styles.btnBox}>
-          <Text style={styles.btnText}>Submit Meow!</Text>
-        </Link>
+        <TouchableOpacity
+          style={styles.btnBox}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color={Colors.white} />
+          ) : (
+            <Text style={styles.btnText}>Submit Meow!</Text>
+          )}
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
