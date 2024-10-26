@@ -15,7 +15,7 @@ const LoginScreen = () => {
         Get ready for a pawsome ride through the funniest, sassiest cat memes
         ever
       </Text>
-      <Link href="./loginOrSignup" style={styles.btnBox}>
+      <Link href="./editProfile" style={styles.btnBox}>
         <Text style={styles.btnText}>Let's Get Started 😻</Text>
       </Link>
     </View>

@@ -1,12 +1,20 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const path = require("path");
 require("dotenv").config();
 const cors = require("cors");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+const corsOptions = {
+  origin: ["http://localhost:5000/"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization", "multipart/form-data"],
+};
+app.use(cors(corsOptions));
+app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
