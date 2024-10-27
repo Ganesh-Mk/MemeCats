@@ -10,6 +10,7 @@ const Entrance = () => {
         source={require("../assets/gif/happyCat.gif")}
         style={styles.image}
       />
+
       <Text style={styles.welcomeText}>Welcome, Hooman!</Text>
       <Text style={styles.subText}>
         Get ready for a pawsome ride through the funniest, sassiest cat memes
@@ -32,6 +33,28 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.pink,
     height: "100%",
     padding: "2rem",
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  likes: {
+    fontSize: 16,
+    color: "gray",
+  },
+  video: {
+    width: "100%",
+    height: 250,
+    marginVertical: 10,
+  },
+  commentContainer: {
+    marginTop: 10,
+  },
+  commentName: {
+    fontWeight: "bold",
+  },
+  commentText: {
+    color: "gray",
   },
   welcomeText: {
     fontSize: 50,
