@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const EditPost = () => {
+const Edit = () => {
   return (
     <View>
-      <Text>EditPost</Text>
+      <Text>Edit</Text>
     </View>
   );
 };
 
-export default EditPost;
+export default Edit;
 
 const styles = StyleSheet.create({});

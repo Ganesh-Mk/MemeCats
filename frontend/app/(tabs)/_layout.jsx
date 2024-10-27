@@ -2,9 +2,8 @@ import { Tabs } from "expo-router";
 
 const TabsLayout = () => {
   return (
-    <Tabs initialRouteName="index">
-      <Tabs.Screen name="leaderboard" />
-      <Tabs.Screen name="index" />
+    <Tabs>
+      <Tabs.Screen name="home" options={{ headerShown: false }} />
       <Tabs.Screen name="account" />
     </Tabs>
   );

@@ -1,32 +1,29 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Link } from "expo-router";
-import Colors from "../../constants/Colors";
 
-const AccountScreen = () => {
+const Home = () => {
   return (
     <View style={styles.container}>
-      <Text>Account Screen</Text>
+      <Text>Home Screen</Text>
+      <Link href={"../home/settings"} style={styles.btn}>
+        Settings
+      </Link>
+      <Link href={"../home/edit"} style={styles.btn}>
+        Edit
+      </Link>
     </View>
   );
 };
 
-export default AccountScreen;
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.pink,
+    backgroundColor: "grey",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-  },
-  btn: {
-    backgroundColor: Colors.red,
-    padding: 10,
-    color: Colors.white,
-    borderRadius: 10,
-    fontFamily: "Regular",
-    fontSize: 20,
   },
 });
