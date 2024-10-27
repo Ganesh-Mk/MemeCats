@@ -3,66 +3,50 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  View,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableOpacity,
   ActivityIndicator,
-  View,
-  Button,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
-import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 
-const defaultImage =
-  "https://static-00.iconduck.com/assets.00/cat-symbol-icon-256x256-jqp15brc.png";
+const images = {
+  signup: require("../../assets/gif/dancingCat.gif"),
+  name: require("../../assets/gif/wishingCat.gif"),
+  email: require("../../assets/gif/sleepingCat.gif"),
+  password: require("../../assets/gif/popCat.gif"),
+};
 
-const EditProfileScreen = () => {
+const Signup = () => {
+  const [focusedField, setFocusedField] = useState("signup");
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
-  const [image, setImage] = useState(null);
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      console.log(result.assets[0]);
-      setImage(result.assets[0]);
-    }
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async () => {
+    router.push("../(tabs)/reels");
+
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", "ganesh@gmail.com");
-
-    const profileImage = {
-      uri: image.uri,
-      type: image.mimeType,
-      name: image.uri.split("/").pop(),
-    };
-    formData.append("profileImage", profileImage);
-    console.log("Profile Image:", profileImage);
-
     try {
-      const response = await fetch("http://localhost:5000/editProfile", {
-        method: "PATCH",
-        body: formData,
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
       });
 
-      if (!response.ok) {
-        console.log(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-      console.log(data); // Handle the response data as needed
+      if (response.ok) {
+        router.push("../(tabs)/reels");
+      } else {
+        console.error(data.message);
+      }
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -73,30 +57,37 @@ const EditProfileScreen = () => {
   return (
     <SafeAreaView style={styles.screen}>
       <KeyboardAvoidingView style={styles.keyboardAvoidingView}>
-        {/* <TouchableOpacity
-          onPress={handleImagePicker}
-          style={styles.imageContainer}
-        >
-          <Image
-            source={{ uri: profileImage || defaultImage }}
-            style={styles.profileImage}
-          />
-        </TouchableOpacity> */}
-
-        <View style={styles.container}>
-          <Button title="Pick an image from camera roll" onPress={pickImage} />
-          {image && <Image source={{ uri: image }} style={styles.image} />}
+        <View style={styles.imageContainer}>
+          <Image source={images[focusedField]} style={styles.image} />
         </View>
 
-        <Text style={styles.headText}>Edit Profile</Text>
-        <Text style={styles.subText}>Update Your Information</Text>
+        <Text style={styles.headText}>Meow Up</Text>
+        <Text style={styles.subText}>Create New Account</Text>
 
         <TextInput
-          placeholder="Your New Cat Name 😻"
+          placeholder="Your Cat Name 😻"
           placeholderTextColor={Colors.gray}
           style={styles.input}
-          value={name}
+          onFocus={() => setFocusedField("name")}
           onChangeText={setName}
+        />
+
+        <TextInput
+          placeholder="Your Email 🐱"
+          placeholderTextColor={Colors.gray}
+          style={styles.input}
+          keyboardType="email-address"
+          onFocus={() => setFocusedField("email")}
+          onChangeText={setEmail}
+        />
+
+        <TextInput
+          placeholder="New Password 🙀"
+          placeholderTextColor={Colors.gray}
+          style={styles.input}
+          secureTextEntry
+          onFocus={() => setFocusedField("password")}
+          onChangeText={setPassword}
         />
 
         <TouchableOpacity
@@ -107,7 +98,7 @@ const EditProfileScreen = () => {
           {loading ? (
             <ActivityIndicator color={Colors.white} />
           ) : (
-            <Text style={styles.btnText}>Save Changes</Text>
+            <Text style={styles.btnText}>Submit Meow!</Text>
           )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
@@ -115,18 +106,9 @@ const EditProfileScreen = () => {
   );
 };
 
-export default EditProfileScreen;
+export default Signup;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: 200,
-    height: 200,
-  },
   screen: {
     display: "flex",
     justifyContent: "flex-start",
@@ -141,15 +123,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imageContainer: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 300,
+    height: 200,
     overflow: "hidden",
-    borderWidth: 2,
-    borderColor: Colors.red,
-    marginBottom: 20,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  profileImage: {
+  image: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
@@ -198,51 +178,3 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

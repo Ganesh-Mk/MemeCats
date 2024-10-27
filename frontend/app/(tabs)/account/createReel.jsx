@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Settings = () => {
+const CreateReel = () => {
   return (
     <View>
-      <Text>Settings Screens</Text>
+      <Text>CreateReel</Text>
     </View>
   );
 };
 
-export default Settings;
+export default CreateReel;
 
 const styles = StyleSheet.create({});

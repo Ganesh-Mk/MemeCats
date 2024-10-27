@@ -2,26 +2,20 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Link } from "expo-router";
 
-const Home = () => {
+const Reels = () => {
   return (
     <View style={styles.container}>
-      <Text>Home Screen</Text>
-      <Link href={"../home/settings"} style={styles.btn}>
-        Settings
-      </Link>
-      <Link href={"../home/edit"} style={styles.btn}>
-        Edit
-      </Link>
+      <Text>Reels Screen</Text>
     </View>
   );
 };
 
-export default Home;
+export default Reels;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "grey",
+    backgroundColor: "lightgrey",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,

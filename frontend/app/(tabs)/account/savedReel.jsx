@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Edit = () => {
+const SavedReel = () => {
   return (
     <View>
-      <Text>Edit</Text>
+      <Text>SavedReel</Text>
     </View>
   );
 };
 
-export default Edit;
+export default SavedReel;
 
 const styles = StyleSheet.create({});
