@@ -14,7 +14,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "multipart/form-data"],
 };
 app.use(cors(corsOptions));
-app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
