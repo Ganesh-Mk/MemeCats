@@ -1,15 +1,18 @@
 import { FlatList, StyleSheet, Text, View, Dimensions } from "react-native";
 import React, { useEffect, useState, useRef } from "react"; // Import useRef from React
 import { Video } from "expo-av";
+import { BACKEND_URL } from "../../../env";
 
 const Reels = () => {
   const [data, setData] = useState([]);
   const videoRefs = useRef([]); // Create a ref array to store multiple video refs
 
   async function getData() {
-    const response = await fetch("http://localhost:3000/getReels");
+    // console.log("BACKEND_URL: ", BACKEND_URL);
+    // const response = await fetch(`${BACKEND_URL}/getReels`);
+    const response = await fetch(`${BACKEND_URL}/getAllReels`);
     const data = await response.json();
-    setData(data);
+    setData(data.data);
   }
 
   useEffect(() => {

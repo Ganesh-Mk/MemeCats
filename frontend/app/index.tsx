@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.pink,
     height: "100%",
-    padding: "2rem",
+    // padding: "2rem",
   },
   name: {
     fontSize: 18,

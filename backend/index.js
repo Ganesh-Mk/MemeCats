@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const corsOptions = {
-  origin: ["http://localhost:5000/"],
+  origin: [`${process.env.FRONTEND_URL}`],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "multipart/form-data"],
 };
@@ -40,7 +40,9 @@ const User = require("./models/userModel");
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Database Connected"))
+  .then(() => {
+    console.log("Database Connected: ", process.env.MONGODB_URI);
+  })
   .catch((err) => console.error("Database Connection Failed: ", err));
 
 app.get("/", async (req, res) => {
@@ -61,7 +63,9 @@ app.patch("/editReel", editReelRouter);
 app.delete("/deleteUser", deleteUserRouter);
 app.delete("/deleteReel", deleteReelRouter);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+
+module.exports = app;
