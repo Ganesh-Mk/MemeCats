@@ -1,23 +1,22 @@
 import { FlatList, StyleSheet, Text, View, Dimensions } from "react-native";
-import React, { useEffect, useState, useRef } from "react"; // Import useRef from React
+import React, { useEffect, useState, useRef } from "react";
 import { Video } from "expo-av";
 import { BACKEND_URL } from "../../../env";
 
 const Reels = () => {
   const [data, setData] = useState([]);
-  const videoRefs = useRef([]); // Create a ref array to store multiple video refs
+  const videoRefs = useRef([]);
 
   async function getData() {
-    // console.log("BACKEND_URL: ", BACKEND_URL);
-    // const response = await fetch(`${BACKEND_URL}/getReels`);
     const response = await fetch(`${BACKEND_URL}/getAllReels`);
     const data = await response.json();
-    setData(data.data);
+    console.log(data);
+    setData(data.allReels);
   }
 
   useEffect(() => {
     getData();
-  }, []); // Added dependency array to run only once
+  }, []);
 
   return (
     <FlatList
