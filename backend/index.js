@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const corsOptions = {
-  origin: [`${process.env.FRONTEND_URL}`],
+  origin: [`${process.env.FRONTEND_URL}`, "http://localhost:8081"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "multipart/form-data"],
 };
