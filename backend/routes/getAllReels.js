@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/userModel");
+const Reel = require("../models/reelsModel");
 
 const sortReels = (reels) => {
   return reels.sort((a, b) => {

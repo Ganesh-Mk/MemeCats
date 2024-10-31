@@ -5,8 +5,7 @@ const User = require("../models/userModel");
 router.patch("/editProfile", async (req, res) => {
   const { name, email } = req.body;
 
-  console.log("req.body: ", req.body);
-
+  console.log(name, email);
   try {
     const user = await User.findOne({ email });
     if (user) {

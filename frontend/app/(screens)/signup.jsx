@@ -12,6 +12,14 @@ import {
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
+import { useDispatch } from "react-redux";
+import {
+  storeName,
+  storeEmail,
+  storeProfileImage,
+  storeReels,
+} from "../../store/user";
 
 const images = {
   signup: require("../../assets/gif/dancingCat.gif"),
@@ -21,6 +29,7 @@ const images = {
 };
 
 const Signup = () => {
+  const dispatch = useDispatch();
   const [focusedField, setFocusedField] = useState("signup");
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -29,9 +38,18 @@ const Signup = () => {
   const router = useRouter();
 
   const handleSubmit = async () => {
-    router.push("../(tabs)/reels");
+    if (!name || !email || !password) {
+      console.log("not all fields are filled");
+      Toast.show({
+        type: "error",
+        text1: "All fields are required",
+        text2: "Please fill in all the fields",
+      });
+      return;
+    }
 
     setLoading(true);
+
     try {
       const response = await fetch("http://localhost:5000/signup", {
         method: "POST",
@@ -42,13 +60,31 @@ const Signup = () => {
       });
 
       const data = await response.json();
+
       if (response.ok) {
+        dispatch(storeName(name));
+        dispatch(storeEmail(email));
+        dispatch(storeReels([]));
         router.push("../(tabs)/reels");
+        Toast.show({
+          type: "success",
+          text1: "Welcome!",
+          text2: "Start your journey with Meow 👋",
+        });
       } else {
-        console.error(data.message);
+        Toast.show({
+          type: "error",
+          text1: "Signup Failed",
+          text2: data.message || "Email already exists. Please try again.",
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Network Error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "Please check your internet connection and try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -170,11 +206,11 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderRadius: 10,
     width: 300,
-    textAlign: "center",
   },
   btnText: {
     fontFamily: "Bold",
     fontSize: 25,
+    textAlign: "center",
     color: Colors.white,
   },
 });

@@ -13,6 +13,14 @@ import {
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import { router } from "expo-router";
+import Toast from "react-native-toast-message";
+import { useDispatch } from "react-redux";
+import {
+  storeName,
+  storeEmail,
+  storeProfileImage,
+  storeReels,
+} from "../../store/user.js";
 
 const images = {
   login: require("../../assets/gif/kissCat.gif"),
@@ -21,15 +29,24 @@ const images = {
 };
 
 const Login = () => {
+  const dispatch = useDispatch();
   const [focusedField, setFocusedField] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState("");
 
   const handleSubmit = async () => {
-    router.push("../(tabs)/reels");
+    if (!email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "All fields are required",
+        text2: "Please fill in all the fields",
+      });
+      return;
+    }
 
     setLoading(true);
+
     try {
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
@@ -40,14 +57,33 @@ const Login = () => {
       });
 
       const data = await response.json();
+
       if (response.ok) {
         router.push("../(tabs)/reels");
-        console.log(data.user);
+        Toast.show({
+          type: "success",
+          text1: "Welcome Back!",
+          text2: "Happy to see you again 👋",
+        });
+
+        dispatch(storeName(data.user.name));
+        dispatch(storeEmail(data.user.email));
+        dispatch(storeProfileImage(data.user.profileImage));
+        dispatch(storeReels(data.user.reels));
       } else {
-        console.error(data.message);
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: data.message || "Invalid email or password.",
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Network Error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "Please check your internet connection.",
+      });
     } finally {
       setLoading(false);
     }
@@ -161,11 +197,11 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderRadius: 10,
     width: 300,
-    textAlign: "center",
   },
   btnText: {
     fontFamily: "Bold",
     fontSize: 25,
+    textAlign: "center",
     color: Colors.white,
   },
 });

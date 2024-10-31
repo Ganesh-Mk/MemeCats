@@ -10,8 +10,6 @@ const Reels = () => {
   async function getData() {
     const response = await fetch(`${BACKEND_URL}/getAllReels`);
     const data = await response.json();
-    console.log(data);
-    console.log("BACKEND_URL: ", BACKEND_URL);
     setData(data.allReels);
   }
 
