@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View, Dimensions } from "react-native";
+import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { Video } from "expo-av";
 import { BACKEND_URL } from "../../../env";
@@ -24,22 +24,22 @@ const Reels = () => {
       renderItem={({ item, index }) => (
         <View style={styles.container}>
           <Video
-            source={{ uri: item.reelVideoUrl }}
+            source={{ uri: item.reelUrl }}
             style={styles.video}
-            // resizeMode="contain" // Ensure video maintains its aspect ratio
             useNativeControls
-            shouldPlay // This prop ensures the video plays automatically
-            isLooping // This prop ensures the video loops indefinitely
+            shouldPlay
+            isLooping
             onPlaybackStatusUpdate={(status) => {
               if (status.isLoaded && !status.isPlaying) {
-                // Play video if loaded but not playing
-                videoRefs.current[index]?.playAsync(); // Use the ref from videoRefs
+                videoRefs.current[index]?.playAsync();
               }
             }}
             ref={(ref) => {
-              videoRefs.current[index] = ref; // Store the ref for each video
+              videoRefs.current[index] = ref;
             }}
+            resizeMode="contain" // Adjusted to contain the video
           />
+
           <View style={styles.contentContainer}>
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.likes}>Total Likes: {item.totalLikes}</Text>
@@ -52,15 +52,14 @@ const Reels = () => {
                   <Text style={styles.commentText}>{comment.text}</Text>
                 </View>
               )}
-              // Added a max height to limit comment section size
               style={styles.commentsList}
             />
           </View>
         </View>
       )}
-      pagingEnabled // Enables snap to screen height
-      showsVerticalScrollIndicator={false} // Hides scroll indicator
-      contentContainerStyle={styles.contentContainerStyle} // Center content
+      pagingEnabled
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.contentContainerStyle}
     />
   );
 };
@@ -70,46 +69,45 @@ export default Reels;
 const styles = StyleSheet.create({
   container: {
     width: "100vw",
-    height: "94vh", // Full height for each reel
-    backgroundColor: "black", // Set black background for the full screen
-    justifyContent: "center", // Center content vertically
+    height: "100vh", // Full height for each reel
+    backgroundColor: "black",
+    justifyContent: "center",
   },
   video: {
-    width: "100%",
-    height: "100%",
-    backgroundClip: "contain",
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
   },
   contentContainer: {
-    position: "absolute", // Position content on top of the video
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     padding: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Semi-transparent background for readability
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   name: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "white", // Change text color to white for contrast
+    color: "white",
   },
   likes: {
     fontSize: 16,
-    color: "lightgray", // Light gray for likes text
+    color: "lightgray",
   },
   commentContainer: {
     marginTop: 10,
   },
   commentName: {
     fontWeight: "bold",
-    color: "white", // Change comment name color to white
+    color: "white",
   },
   commentText: {
-    color: "lightgray", // Light gray for comment text
+    color: "lightgray",
   },
   commentsList: {
-    maxHeight: 200, // Limit the height of comments
+    maxHeight: 200,
   },
   contentContainerStyle: {
-    alignItems: "center", // Center items within FlatList
+    alignItems: "center",
   },
 });

@@ -1,9 +1,16 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Colors from "../constants/Colors";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { useSelector } from "react-redux";
 
 const Entrance = () => {
+  const user = useSelector((state) => state.user);
+  useEffect(() => {
+    if (user.name !== "") {
+      setTimeout(() => router.push("./(tabs)/reels"), 0);
+    }
+  }, [user]);
   return (
     <View style={styles.loginScreen}>
       <Image
@@ -32,7 +39,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.pink,
     height: "100%",
-    // padding: "2rem",
   },
   name: {
     fontSize: 18,

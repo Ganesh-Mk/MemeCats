@@ -26,6 +26,7 @@ const getReelRouter = require("./routes/getReel");
 const deleteReelRouter = require("./routes/deleteReel");
 const editReelRouter = require("./routes/editReel");
 const deleteRouter = require("./routes/delete");
+const getUserRouter = require("./routes/getUser");
 
 app.use(signupRouter);
 app.use(loginRouter);
@@ -37,6 +38,7 @@ app.use(getReelRouter);
 app.use(deleteReelRouter);
 app.use(editReelRouter);
 app.use(deleteRouter);
+app.use(getUserRouter);
 
 const User = require("./models/userModel");
 
@@ -56,6 +58,7 @@ app.get("/", async (req, res) => {
 app.get("/getAllReels", getAllReelsRouter);
 app.get("/getReel", getReelRouter);
 app.get("/delete", deleteRouter);
+app.get("/getUser", getUserRouter);
 
 app.post("/signup", signupRouter);
 app.post("/login", loginRouter);

@@ -6,7 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, router } from "expo-router";
 import Colors from "../../../constants/Colors";
 import { Video } from "expo-av";
@@ -18,7 +18,7 @@ import {
   storeReels,
 } from "../../../store/user";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import Feather from "@expo/vector-icons/Feather";
+import { BACKEND_URL } from "../../../env";
 
 const AccountScreen = () => {
   const dispatch = useDispatch();
@@ -30,8 +30,35 @@ const AccountScreen = () => {
     dispatch(storeEmail(""));
     dispatch(storeProfileImage(""));
     dispatch(storeReels([]));
-    router.push("../../../");
+    router.push("../../");
   };
+
+  useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/getUser`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: "c",
+          }),
+        });
+
+        const data = await response.json();
+        console.log(data.user);
+
+        dispatch(storeName(data.user.name));
+        dispatch(storeEmail(data.user.email));
+        dispatch(storeProfileImage(data.user.profileImage));
+        dispatch(storeReels(data.user.reels));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    loadAllData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -43,11 +70,18 @@ const AccountScreen = () => {
       </View>
       {/* Profile Info */}
       <View style={styles.profileInfoContainer}>
-        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+        <Image
+          source={{
+            uri:
+              profileImage ||
+              "https://static-00.iconduck.com/assets.00/cat-symbol-icon-256x256-jqp15brc.png",
+          }}
+          style={styles.profileImage}
+        />
         <View style={styles.profileDetails}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.email}>{email}</Text>
-          <Text style={styles.reelCount}>Total Reels: {reels.length}</Text>
+          <Text style={styles.reelCount}>Total Reels: {reels?.length}</Text>
         </View>
       </View>
 
@@ -87,7 +121,7 @@ const AccountScreen = () => {
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.reelContainer}>
             <Video
-              source={{ uri: item.reelVideoUrl }}
+              source={{ uri: item.reelUrl }}
               style={styles.reelVideo}
               useNativeControls
               resizeMode="contain"

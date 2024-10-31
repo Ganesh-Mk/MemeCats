@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
 import store from "../store/store.js";

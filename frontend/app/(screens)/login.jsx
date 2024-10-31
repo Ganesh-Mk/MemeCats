@@ -36,6 +36,8 @@ const Login = () => {
   const [loading, setLoading] = useState("");
 
   const handleSubmit = async () => {
+    router.push("../(tabs)/reels");
+
     if (!email || !password) {
       Toast.show({
         type: "error",
@@ -59,7 +61,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("../(tabs)/reels");
+        router.push("../(tabs)/");
         Toast.show({
           type: "success",
           text1: "Welcome Back!",
