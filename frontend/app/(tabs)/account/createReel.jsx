@@ -12,13 +12,17 @@ import {
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import Colors from "../../../constants/Colors"; // Assuming the theme colors are defined here
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { BACKEND_URL } from "../../../env";
 import { router } from "expo-router";
+import { storeReels } from "../../../store/user";
 
 const CreateReel = () => {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const [media, setMedia] = useState(null);
+  const [media, setMedia] = useState(
+    "https://videos.pexels.com/video-files/6568032/6568032-hd_1920_1080_30fps.mp4"
+  );
   const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -37,10 +41,6 @@ const CreateReel = () => {
 
   // Handle share button
   const handleShare = async () => {
-    setMedia(
-      "https://videos.pexels.com/video-files/6568032/6568032-hd_1920_1080_30fps.mp4"
-    );
-
     if (!media || !desc) {
       Alert.alert("Error", "Please fill in all the fields");
       return;
@@ -61,7 +61,23 @@ const CreateReel = () => {
       });
 
       const data = await response.json();
-      console.log("Success:", data.message);
+      console.log("Successfully created reel:", data.message);
+
+      let prevReels = user.reels;
+      console.log(user);
+      // dispatch(
+      //   storeReels([
+      //     ...prevReels,
+      //     {
+      //       user: user.name,
+      //       reelUrl: media,
+      //       desc: desc,
+      //       dailyLikes: 0,
+      //       totalLikes: 0,
+      //       comments: [],
+      //     },
+      //   ])
+      // );
       setLoading(false);
 
       router.push("../account");

@@ -100,7 +100,6 @@ const EditProfileScreen = () => {
     });
 
     if (!result.canceled) {
-      console.log(result.assets[0]);
       setImage(result.assets[0]);
     }
   };
@@ -118,7 +117,6 @@ const EditProfileScreen = () => {
       name: image.uri.split("/").pop(),
     };
     formData.append("profileImage", profileImage);
-    console.log("Profile Image:", profileImage);
 
     try {
       const response = await fetch("http://localhost:5000/editProfile", {

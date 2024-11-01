@@ -1,16 +1,25 @@
 import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
 import store from "../store/store.js";
+import { View, ActivityIndicator } from "react-native";
 
 const RootLayout = () => {
-  useFonts({
+  const [fontsLoaded] = useFonts({
     Thin: require("../assets/fonts/Outfit-ExtraLight.ttf"),
     Regular: require("../assets/fonts/Outfit-Regular.ttf"),
     Bold: require("../assets/fonts/Outfit-Bold.ttf"),
   });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
 
   return (
     <Provider store={store}>

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect } from "react";
-import { Link, router } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import Colors from "../../../constants/Colors";
 import { Video } from "expo-av";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,8 +19,10 @@ import {
 } from "../../../store/user";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { BACKEND_URL } from "../../../env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const AccountScreen = () => {
+export default function index() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const { name, email, profileImage, reels } = user;
@@ -35,6 +37,12 @@ const AccountScreen = () => {
 
   useEffect(() => {
     const loadAllData = async () => {
+      let email = "";
+      try {
+        email = await AsyncStorage.getItem("email");
+      } catch (error) {
+        console.error("Error retrieving async storage in accountScreen", error);
+      }
       try {
         const response = await fetch(`${BACKEND_URL}/getUser`, {
           method: "POST",
@@ -42,16 +50,13 @@ const AccountScreen = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: "c",
+            email: email,
           }),
         });
 
         const data = await response.json();
-        console.log(data.user);
+        console.log("load data from accountPage", data);
 
-        dispatch(storeName(data.user.name));
-        dispatch(storeEmail(data.user.email));
-        dispatch(storeProfileImage(data.user.profileImage));
         dispatch(storeReels(data.user.reels));
       } catch (err) {
         console.log(err);
@@ -68,7 +73,6 @@ const AccountScreen = () => {
           <AntDesign name="logout" size={27} color={Colors.red} />
         </TouchableOpacity>
       </View>
-      {/* Profile Info */}
       <View style={styles.profileInfoContainer}>
         <Image
           source={{
@@ -84,8 +88,6 @@ const AccountScreen = () => {
           <Text style={styles.reelCount}>Total Reels: {reels?.length}</Text>
         </View>
       </View>
-
-      {/* Action Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={() => router.push("../account/createReel")}
@@ -111,13 +113,11 @@ const AccountScreen = () => {
           />
         </TouchableOpacity>
       </View>
-
-      {/* Reel Grid */}
       <Text style={styles.headerText}>Reels</Text>
       <FlatList
         data={reels}
         numColumns={2}
-        keyExtractor={(item) => item.dateAndTime}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.reelContainer}>
             <Video
@@ -133,9 +133,19 @@ const AccountScreen = () => {
       />
     </View>
   );
-};
+}
 
-export default AccountScreen;
+//  {/* Reel Grid */}
+//
+
+//  {/* Action Buttons */}
+//
+
+/* Profile Info */
+// }  <View style={styles.buttonContainer}>
+//
+// </View>
+//
 
 const styles = StyleSheet.create({
   container: {
@@ -205,10 +215,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
+    height: 44,
   },
   btnText: {
     fontFamily: "Regular",
-    fontSize: "5vw",
+    fontSize: 20,
     textAlign: "center",
     color: Colors.white,
   },

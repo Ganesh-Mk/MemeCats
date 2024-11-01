@@ -20,6 +20,8 @@ import {
   storeProfileImage,
   storeReels,
 } from "../../store/user";
+import { BACKEND_URL } from "../../env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const images = {
   signup: require("../../assets/gif/dancingCat.gif"),
@@ -51,7 +53,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/signup", {
+      const response = await fetch(`${BACKEND_URL}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,6 +67,16 @@ const Signup = () => {
         dispatch(storeName(name));
         dispatch(storeEmail(email));
         dispatch(storeReels([]));
+
+        try {
+          await AsyncStorage.setItem("name", name);
+          await AsyncStorage.setItem("email", email);
+          await AsyncStorage.setItem("profileImage", "");
+          await AsyncStorage.setItem("reels", JSON.stringify([]));
+        } catch (error) {
+          console.error("Error saving data on signup", error);
+        }
+
         router.push("../(tabs)/reels");
         Toast.show({
           type: "success",

@@ -14,11 +14,11 @@ const sortReels = (reels) => {
     const scoreA =
       a.totalLikes * totalLikesPriority +
       a.dailyLikes * dailyLikesPriority +
-      a.comments.length * commentsPriority;
+      a.comments?.length * commentsPriority;
     const scoreB =
       b.totalLikes * totalLikesPriority +
       b.dailyLikes * dailyLikesPriority +
-      b.comments.length * commentsPriority;
+      b.comments?.length * commentsPriority;
 
     // Check if both scores are low, and prioritize lower ones randomly
     if (scoreA < lowEngagementLimit && scoreB < lowEngagementLimit) {

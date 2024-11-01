@@ -21,6 +21,8 @@ import {
   storeProfileImage,
   storeReels,
 } from "../../store/user.js";
+import { BACKEND_URL } from "../../env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const images = {
   login: require("../../assets/gif/kissCat.gif"),
@@ -36,7 +38,7 @@ const Login = () => {
   const [loading, setLoading] = useState("");
 
   const handleSubmit = async () => {
-    router.push("../(tabs)/reels");
+    // router.push("../(tabs)/reels");
 
     if (!email || !password) {
       Toast.show({
@@ -50,7 +52,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${BACKEND_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +63,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("../(tabs)/");
+        router.push("../(tabs)/reels");
         Toast.show({
           type: "success",
           text1: "Welcome Back!",
@@ -72,6 +74,15 @@ const Login = () => {
         dispatch(storeEmail(data.user.email));
         dispatch(storeProfileImage(data.user.profileImage));
         dispatch(storeReels(data.user.reels));
+
+        try {
+          await AsyncStorage.setItem("name", data.user.name);
+          await AsyncStorage.setItem("email", data.user.email);
+          await AsyncStorage.setItem("profileImage", data.user.profileImage);
+          await AsyncStorage.setItem("reels", JSON.stringify(data.user.reels));
+        } catch (error) {
+          console.error("Error saving data on login", error);
+        }
       } else {
         Toast.show({
           type: "error",

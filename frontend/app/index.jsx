@@ -5,12 +5,12 @@ import { Link, router } from "expo-router";
 import { useSelector } from "react-redux";
 
 const Entrance = () => {
-  const user = useSelector((state) => state.user);
-  useEffect(() => {
-    if (user.name !== "") {
-      setTimeout(() => router.push("./(tabs)/reels"), 0);
-    }
-  }, [user]);
+  // const user = useSelector((state) => state.user);
+  // useEffect(() => {
+  //   if (user.name !== "") {
+  //     setTimeout(() => router.push("./(tabs)/account"), 0);
+  //   }
+  // }, [user]);
   return (
     <View style={styles.loginScreen}>
       <Image

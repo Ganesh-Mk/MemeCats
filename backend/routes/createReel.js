@@ -17,7 +17,9 @@ router.post("/createReel", async (req, res) => {
       await newReel.save();
       user.reels.push(newReel._id);
       await user.save();
-      return res.status(200).send({ message: "Reel Created Successfully" });
+      return res.status(200).send({
+        message: "Reel Created Successfully",
+      });
     } else {
       return res.status(404).send({ message: "User Not Found" });
     }
