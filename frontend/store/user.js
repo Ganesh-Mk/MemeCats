@@ -6,6 +6,7 @@ const initialState = {
   email: "",
   profileImage: "",
   reels: [],
+  refreshUser: 0,
 };
 
 export const userSlice = createSlice({
@@ -32,9 +33,18 @@ export const userSlice = createSlice({
       state.reels = action.payload;
       console.log("Reels: ", state.reels);
     },
+    storeRefreshUser: (state) => {
+      state.refreshReels += 1;
+    },
   },
 });
 
-export const { storeId, storeName, storeEmail, storeProfileImage, storeReels } =
-  userSlice.actions;
+export const {
+  storeId,
+  storeName,
+  storeEmail,
+  storeProfileImage,
+  storeReels,
+  storeRefreshUser,
+} = userSlice.actions;
 export default userSlice.reducer;

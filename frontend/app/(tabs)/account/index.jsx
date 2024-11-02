@@ -12,10 +12,12 @@ import Colors from "../../../constants/Colors";
 import { Video } from "expo-av";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  storeId,
   storeName,
   storeEmail,
   storeProfileImage,
   storeReels,
+  storeRefreshUser,
 } from "../../../store/user";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { BACKEND_URL } from "../../../env";
@@ -27,21 +29,26 @@ export default function index() {
   const user = useSelector((state) => state.user);
   const { name, email, profileImage, reels } = user;
 
-  const logout = () => {
+  const logout = async () => {
+    await AsyncStorage.setItem("name", "");
+    dispatch(storeId(""));
     dispatch(storeName(""));
     dispatch(storeEmail(""));
     dispatch(storeProfileImage(""));
     dispatch(storeReels([]));
-    router.push("../../");
+    setTimeout(() => {
+      router.push("../../");
+    }, 0);
   };
 
   useEffect(() => {
+    console.log("UseEffect");
     const loadAllData = async () => {
       let email = "";
       try {
         email = await AsyncStorage.getItem("email");
       } catch (error) {
-        console.error("Error retrieving async storage in accountScreen", error);
+        console.error("Error getting email", error);
       }
       try {
         const response = await fetch(`${BACKEND_URL}/getUser`, {
@@ -55,7 +62,6 @@ export default function index() {
         });
 
         const data = await response.json();
-        console.log("load data from accountPage", data);
 
         dispatch(storeReels(data.user.reels));
       } catch (err) {
@@ -63,7 +69,7 @@ export default function index() {
       }
     };
     loadAllData();
-  }, []);
+  }, [storeRefreshUser]);
 
   return (
     <View style={styles.container}>

@@ -26,25 +26,19 @@ const bufferToStream = (buffer) => {
   return readable;
 };
 
-// Route for creating a new reel
-// Route for creating a new reel
-router.post("/createReel", upload.single("videoFile"), async (req, res) => {
+router.post("/createReel", upload.single("file"), async (req, res) => {
   console.log("Came to backend");
-  const { title, description, user } = req.body; // Add user here
-  const videoFile = req.file;
+  const { desc, user } = req.body; // Add user here
+  const file = req.file;
+
+  console.log("req.body: ", req.body);
 
   try {
-    if (!title || !description) {
-      return res
-        .status(400)
-        .send({ message: "Title and description are required" });
-    }
-
     if (!user) {
       return res.status(400).send({ message: "User is required" });
     }
 
-    if (!videoFile) {
+    if (!file) {
       return res.status(400).send({ message: "Video file is required" });
     }
 
@@ -64,16 +58,13 @@ router.post("/createReel", upload.single("videoFile"), async (req, res) => {
         }
       );
 
-      bufferToStream(videoFile.buffer).pipe(uploadStream);
+      bufferToStream(file.buffer).pipe(uploadStream);
     });
-
-    console.log("After Cloudinary upload", result);
 
     // Save reel data to MongoDB
     const newReel = new Reel({
       user,
-      title,
-      description,
+      desc,
       reelUrl: result.secure_url, // Updated to reelUrl
       publicId: result.public_id,
     });

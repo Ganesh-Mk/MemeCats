@@ -2,15 +2,39 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import React, { useEffect } from "react";
 import Colors from "../constants/Colors";
 import { Link, router } from "expo-router";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import {
+  storeId,
+  storeName,
+  storeEmail,
+  storeProfileImage,
+  storeReels,
+  storeRefreshUser,
+} from "../store/user.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Entrance = () => {
-  // const user = useSelector((state) => state.user);
-  // useEffect(() => {
-  //   if (user.name !== "") {
-  //     setTimeout(() => router.push("./(tabs)/account"), 0);
-  //   }
-  // }, [user]);
+  const dispatch = useDispatch();
+  async function autoLogin() {
+    const name = await AsyncStorage.getItem("name");
+    console.log("name=======: ", name);
+    if (name === "" || name === null || name === undefined) {
+      console.log("Logout out/ new User");
+    } else {
+      setTimeout(() => router.push("./(tabs)/reels"), 0);
+      dispatch(storeId(await AsyncStorage.getItem("id")));
+      dispatch(storeName(await AsyncStorage.getItem("name")));
+      dispatch(storeEmail(await AsyncStorage.getItem("email")));
+      dispatch(storeProfileImage(await AsyncStorage.getItem("profileImage")));
+      dispatch(storeReels(await AsyncStorage.getItem("reels")));
+      dispatch(storeRefreshUser(0));
+    }
+  }
+
+  useEffect(() => {
+    autoLogin();
+  }, []);
+
   return (
     <View style={styles.loginScreen}>
       <Image

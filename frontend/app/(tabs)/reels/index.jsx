@@ -2,6 +2,7 @@ import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { Video } from "expo-av";
 import { BACKEND_URL } from "../../../env";
+import { storeRefreshUser } from "../../../store/user";
 
 const Reels = () => {
   const [data, setData] = useState([]);
@@ -15,7 +16,7 @@ const Reels = () => {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [storeRefreshUser]);
 
   return (
     <FlatList
@@ -27,16 +28,16 @@ const Reels = () => {
             source={{ uri: item.reelUrl }}
             style={styles.video}
             useNativeControls
-            shouldPlay
-            isLooping
-            onPlaybackStatusUpdate={(status) => {
-              if (status.isLoaded && !status.isPlaying) {
-                videoRefs.current[index]?.playAsync();
-              }
-            }}
-            ref={(ref) => {
-              videoRefs.current[index] = ref;
-            }}
+            // shouldPlay
+            // isLooping
+            // onPlaybackStatusUpdate={(status) => {
+            //   if (status.isLoaded && !status.isPlaying) {
+            //     videoRefs.current[index]?.playAsync();
+            //   }
+            // }}
+            // ref={(ref) => {
+            //   videoRefs.current[index] = ref;
+            // }}
             resizeMode="contain" // Adjusted to contain the video
           />
 
@@ -77,14 +78,14 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
   },
-  contentContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-  },
+  // contentContainer: {
+  //   position: "absolute",
+  //   bottom: 0,
+  //   left: 0,
+  //   right: 0,
+  //   padding: 20,
+  //   backgroundColor: "rgba(0, 0, 0, 0.7)",
+  // },
   name: {
     fontSize: 18,
     fontWeight: "bold",

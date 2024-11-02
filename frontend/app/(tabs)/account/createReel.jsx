@@ -13,13 +13,15 @@ import * as ImagePicker from "expo-image-picker";
 import Colors from "../../../constants/Colors";
 import { useDispatch, useSelector } from "react-redux";
 import { BACKEND_URL } from "../../../env";
-import { storeReels } from "../../../store/user";
+import { storeReels, storeRefreshUser } from "../../../store/user.js";
 import { Image } from "react-native";
 import { Video } from "expo-av";
+import { router } from "expo-router";
 
 export default function CreateReel() {
   const [media, setMedia] = useState(null); // holds the image or video URI
   const [isUploading, setIsUploading] = useState(false);
+  const [desc, setDesc] = useState("");
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
@@ -35,12 +37,10 @@ export default function CreateReel() {
 
     // Pick image or video
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       quality: 1,
     });
-
-    console.log("result", result);
 
     // Check if media is not canceled and get the URI
     if (!result.canceled) {
@@ -49,20 +49,21 @@ export default function CreateReel() {
         uri: selectedMedia.uri,
         type: selectedMedia.type, // This will be "image" or "video"
       });
-      console.log("Media selected:", selectedMedia.uri, selectedMedia.type);
     }
   };
 
   const uploadMedia = async () => {
-    if (!media) return Alert.alert("Error", "Please select a media first.", []);
+    if (!media)
+      return Alert.alert("Error", "Please select a media first.", {
+        text: "OK",
+      });
 
     setIsUploading(true);
     let formData = new FormData();
-    console.log("user._id: ", user.id);
+    console.log("user.id: ", user);
     formData.append("user", user.id); // Add title to formData
-    formData.append("title", `Some title ${Date.now()}`); // Add title to formData
-    formData.append("description", `Some description ${Date.now()}`); // Add description to formData
-    formData.append("videoFile", {
+    formData.append("description", desc); // Add description to formData
+    formData.append("file", {
       uri: media.uri,
       type: media.type === "video" ? "video/mp4" : "image/jpeg",
       name: `reel.${media.type === "video" ? "mp4" : "jpg"}`,
@@ -77,9 +78,8 @@ export default function CreateReel() {
       const data = await response.json();
       if (data.success) {
         dispatch(storeReels(data.reel)); // Store in Redux if needed
-        Alert.alert("Upload Success", "Reel uploaded successfully!", [
-          { text: "OK" },
-        ]);
+        dispatch(storeRefreshUser());
+        router.push("../account");
       } else {
         Alert.alert("Upload Failed", data.message, [{ text: "OK" }]);
       }
@@ -92,54 +92,79 @@ export default function CreateReel() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.headerText}>Hey Hooman, make me famous! 🐱</Text>
+
+      {media && (
+        <Video
+          source={{ uri: media.uri }}
+          style={{ width: 300, height: 300 }}
+          useNativeControls
+          resizeMode="contain"
+        />
+      )}
+
       <TouchableOpacity onPress={pickMedia} style={styles.pickMediaBtn}>
-        <Text style={styles.pickMediaText}>Pick Image/Video</Text>
+        <Text style={styles.pickMediaText}>Select Video/Reel</Text>
       </TouchableOpacity>
 
-      {media &&
-        (media.type === "video" ? (
-          <Video
-            source={{ uri: media.uri }}
-            style={{ width: 300, height: 300 }}
-            useNativeControls
-            resizeMode="contain"
-          />
-        ) : (
-          <Image
-            source={{ uri: media.uri }}
-            style={{ width: 300, height: 300 }}
-          />
-        ))}
+      <TextInput
+        style={styles.input}
+        placeholder="Add a description"
+        value={desc}
+        onChangeText={setDesc}
+      />
 
       <TouchableOpacity onPress={uploadMedia} style={styles.uploadBtn}>
-        <Text style={styles.uploadText}>Upload</Text>
+        {isUploading ? (
+          <ActivityIndicator size="large" color={Colors.primary} />
+        ) : (
+          <Text style={styles.uploadText}>Upload</Text>
+        )}
       </TouchableOpacity>
-
-      {isUploading && <ActivityIndicator size="large" color={Colors.primary} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f8f8",
+    padding: 20,
+    alignItems: "center",
+  },
+  headerText: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
   pickMediaBtn: {
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.red,
+    justifyContent: "center",
     padding: 15,
+    width: "100%",
+    marginVertical: 20,
     borderRadius: 5,
     alignItems: "center",
   },
-  pickMediaText: { color: "#fff", fontSize: 16 },
-  preview: {
-    width: 800,
-    height: 300,
-    marginVertical: 20,
-    border: "2px solid black",
+  pickMediaText: { color: "white", fontSize: 16 },
+  input: {
+    height: 50,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    width: "100%",
+    backgroundColor: "#fff",
   },
   uploadBtn: {
-    backgroundColor: Colors.black,
-    padding: 15,
+    backgroundColor: Colors.red,
+    paddingVertical: 15,
     borderRadius: 5,
     alignItems: "center",
+    width: "100%",
+    marginVertical: 20,
   },
-  uploadText: { color: "white", fontSize: 16 },
+  uploadText: { color: "#fff", fontSize: 16 },
 });
