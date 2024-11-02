@@ -20,6 +20,7 @@ import {
   storeEmail,
   storeProfileImage,
   storeReels,
+  storeId,
 } from "../../store/user.js";
 import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -70,6 +71,7 @@ const Login = () => {
           text2: "Happy to see you again 👋",
         });
 
+        dispatch(storeId(data.user._id));
         dispatch(storeName(data.user.name));
         dispatch(storeEmail(data.user.email));
         dispatch(storeProfileImage(data.user.profileImage));

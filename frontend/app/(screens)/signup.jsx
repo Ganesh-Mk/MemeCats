@@ -19,6 +19,7 @@ import {
   storeEmail,
   storeProfileImage,
   storeReels,
+  storeId,
 } from "../../store/user";
 import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -62,8 +63,10 @@ const Signup = () => {
       });
 
       const data = await response.json();
+      console.log("data.id: ", data.id);
 
       if (response.ok) {
+        dispatch(storeId(data.id));
         dispatch(storeName(name));
         dispatch(storeEmail(email));
         dispatch(storeReels([]));

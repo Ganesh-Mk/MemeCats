@@ -27,7 +27,9 @@ export default function CreateReel() {
     // Request permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permission needed", "We need media permission to upload.");
+      Alert.alert("Permission needed", "We need media permission to upload.", [
+        { text: "OK" },
+      ]);
       return;
     }
 
@@ -49,23 +51,25 @@ export default function CreateReel() {
       });
       console.log("Media selected:", selectedMedia.uri, selectedMedia.type);
     }
-
-    console.log("Media selected:", media);
   };
 
   const uploadMedia = async () => {
-    if (!media) return Alert.alert("Error", "Please select a media first.");
+    if (!media) return Alert.alert("Error", "Please select a media first.", []);
 
     setIsUploading(true);
     let formData = new FormData();
-    formData.append("file", {
-      uri: media,
-      type: media.endsWith(".mp4") ? "video/mp4" : "image/jpeg",
-      name: `reel.${media.endsWith(".mp4") ? "mp4" : "jpg"}`,
+    console.log("user._id: ", user.id);
+    formData.append("user", user.id); // Add title to formData
+    formData.append("title", `Some title ${Date.now()}`); // Add title to formData
+    formData.append("description", `Some description ${Date.now()}`); // Add description to formData
+    formData.append("videoFile", {
+      uri: media.uri,
+      type: media.type === "video" ? "video/mp4" : "image/jpeg",
+      name: `reel.${media.type === "video" ? "mp4" : "jpg"}`,
     });
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/reels`, {
+      const response = await fetch(`${BACKEND_URL}/createReel`, {
         method: "POST",
         headers: { "Content-Type": "multipart/form-data" },
         body: formData,
@@ -73,12 +77,14 @@ export default function CreateReel() {
       const data = await response.json();
       if (data.success) {
         dispatch(storeReels(data.reel)); // Store in Redux if needed
-        Alert.alert("Upload Success", "Reel uploaded successfully!");
+        Alert.alert("Upload Success", "Reel uploaded successfully!", [
+          { text: "OK" },
+        ]);
       } else {
-        Alert.alert("Upload Failed", data.message);
+        Alert.alert("Upload Failed", data.message, [{ text: "OK" }]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to upload media.");
+      Alert.alert("Error", "Failed to upload media.", [{ text: "OK" }]);
     } finally {
       setIsUploading(false);
     }

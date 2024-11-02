@@ -31,7 +31,8 @@ const EditProfile = () => {
       if (status !== "granted") {
         Alert.alert(
           "Permission required",
-          "You need to grant permission to access your photos."
+          "You need to grant permission to access your photos.",
+          [{ text: "OK" }]
         );
       }
     };
@@ -64,13 +65,15 @@ const EditProfile = () => {
       if (response.ok) {
         dispatch(storeName(name));
         dispatch(storeProfileImage(data.user.profileImage));
-        Alert.alert("Success", data.message);
+        Alert.alert("Success", data.message, [{ text: "OK" }]);
         router.push("../account");
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
-      Alert.alert("Error", error.message || "An error occurred");
+      Alert.alert("Error", error.message || "An error occurred", [
+        { text: "OK" },
+      ]);
     } finally {
       setLoading(false);
     }

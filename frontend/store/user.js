@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  id: "",
   name: "",
   email: "",
   profileImage: "",
@@ -11,6 +12,10 @@ export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    storeId: (state, action) => {
+      state.id = action.payload;
+      console.log("ID: ", state.id);
+    },
     storeName: (state, action) => {
       state.name = action.payload;
       console.log("Name: ", state.name);
@@ -30,6 +35,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { storeName, storeEmail, storeProfileImage, storeReels } =
+export const { storeId, storeName, storeEmail, storeProfileImage, storeReels } =
   userSlice.actions;
 export default userSlice.reducer;
