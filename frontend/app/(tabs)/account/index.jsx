@@ -5,6 +5,8 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  Pressable,
+  Alert,
 } from "react-native";
 import React, { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
@@ -29,6 +31,36 @@ export default function index() {
   const user = useSelector((state) => state.user);
   const { name, email, profileImage, reels } = user;
 
+  const handleDeleteReel = async (reelId) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/deleteReel`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user.id, reelId: reelId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        Alert.alert("Error during Reel deletion", errorData.message, [
+          { text: "OK" },
+        ]);
+        console.log("Error deleting reel:", errorData.message);
+        return;
+      }
+
+      const data = await response.json();
+      Alert.alert("Successfully Deleted Reel", data.message, [{ text: "OK" }]);
+
+      // Refresh user state
+      dispatch(storeRefreshUser());
+    } catch (err) {
+      console.error("Error in deleteReel function:", err);
+      Alert.alert("An error occurred", "Unable  to delete the reel.");
+    }
+  };
+
   const logout = async () => {
     await AsyncStorage.setItem("name", "");
     dispatch(storeId(""));
@@ -36,13 +68,10 @@ export default function index() {
     dispatch(storeEmail(""));
     dispatch(storeProfileImage(""));
     dispatch(storeReels([]));
-    setTimeout(() => {
-      router.push("../../");
-    }, 0);
+    router.push("../../");
   };
 
   useEffect(() => {
-    console.log("UseEffect");
     const loadAllData = async () => {
       let email = "";
       try {
@@ -50,26 +79,24 @@ export default function index() {
       } catch (error) {
         console.error("Error getting email", error);
       }
+
       try {
         const response = await fetch(`${BACKEND_URL}/getUser`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email: email,
-          }),
+          body: JSON.stringify({ email }),
         });
 
         const data = await response.json();
-
-        dispatch(storeReels(data.user.reels));
+        dispatch(storeReels(data.user.reels || []));
       } catch (err) {
         console.log(err);
       }
     };
     loadAllData();
-  }, [storeRefreshUser]);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -123,7 +150,7 @@ export default function index() {
       <FlatList
         data={reels}
         numColumns={2}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item._id} // Change to use the reel's _id
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.reelContainer}>
             <Video
@@ -132,7 +159,36 @@ export default function index() {
               useNativeControls
               resizeMode="contain"
             />
-            <Text style={styles.likeCount}>👍 {item.totalLikes} Likes</Text>
+            <View style={styles.actionButtons}>
+              <Text style={styles.likeCount}>👍 {item.totalLikes}</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  if (item._id) {
+                    handleDeleteReel(item._id);
+                  } else {
+                    console.log("Reel ID is missing for this item:", item);
+                    Alert.alert("Error", "Reel ID is missing");
+                  }
+                }}
+              >
+                <AntDesign
+                  name="delete"
+                  size={20}
+                  style={styles.iconDesign}
+                  color={Colors.red}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => console.log("Edit")}>
+                <AntDesign
+                  name="edit"
+                  size={20}
+                  style={styles.iconDesign}
+                  color={Colors.darkBlue}
+                />
+              </TouchableOpacity>
+            </View>
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.reelGrid}
@@ -140,18 +196,6 @@ export default function index() {
     </View>
   );
 }
-
-//  {/* Reel Grid */}
-//
-
-//  {/* Action Buttons */}
-//
-
-/* Profile Info */
-// }  <View style={styles.buttonContainer}>
-//
-// </View>
-//
 
 const styles = StyleSheet.create({
   container: {
@@ -185,6 +229,17 @@ const styles = StyleSheet.create({
     borderColor: Colors.darkPink,
     borderWidth: 3,
     marginRight: 15,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
+    gap: 10,
+  },
+  iconDesign: {
+    backgroundColor: "lightgrey",
+    padding: 5,
+    borderRadius: 100,
   },
   profileDetails: {
     flex: 1,

@@ -17,11 +17,11 @@ const Entrance = () => {
   const dispatch = useDispatch();
   async function autoLogin() {
     const name = await AsyncStorage.getItem("name");
-    console.log("name=======: ", name);
+    console.log("name=======  : ", name);
     if (name === "" || name === null || name === undefined) {
       console.log("Logout out/ new User");
     } else {
-      setTimeout(() => router.push("./(tabs)/reels"), 0);
+      setTimeout(() => router.push("./(tabs)/account"), 0);
       dispatch(storeId(await AsyncStorage.getItem("id")));
       dispatch(storeName(await AsyncStorage.getItem("name")));
       dispatch(storeEmail(await AsyncStorage.getItem("email")));
