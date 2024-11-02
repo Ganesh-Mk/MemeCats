@@ -3,7 +3,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image,
   TextInput,
   ActivityIndicator,
   ScrollView,
@@ -11,215 +10,130 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import Colors from "../../../constants/Colors"; // Assuming the theme colors are defined here
+import Colors from "../../../constants/Colors";
 import { useDispatch, useSelector } from "react-redux";
 import { BACKEND_URL } from "../../../env";
-import { router } from "expo-router";
 import { storeReels } from "../../../store/user";
+import { Image } from "react-native";
+import { Video } from "expo-av";
 
-const CreateReel = () => {
+export default function CreateReel() {
+  const [media, setMedia] = useState(null); // holds the image or video URI
+  const [isUploading, setIsUploading] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const [media, setMedia] = useState(
-    "https://videos.pexels.com/video-files/6568032/6568032-hd_1920_1080_30fps.mp4"
-  );
-  const [desc, setDesc] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // Function to pick image or video
   const pickMedia = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    // Request permission
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission needed", "We need media permission to upload.");
+      return;
+    }
+
+    // Pick image or video
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       quality: 1,
     });
 
+    console.log("result", result);
+
+    // Check if media is not canceled and get the URI
     if (!result.canceled) {
-      setMedia(result.assets[0].uri);
+      const selectedMedia = result.assets[0];
+      setMedia({
+        uri: selectedMedia.uri,
+        type: selectedMedia.type, // This will be "image" or "video"
+      });
+      console.log("Media selected:", selectedMedia.uri, selectedMedia.type);
     }
+
+    console.log("Media selected:", media);
   };
 
-  // Handle share button
-  const handleShare = async () => {
-    if (!media || !desc) {
-      Alert.alert("Error", "Please fill in all the fields");
-      return;
-    }
-    setLoading(true);
+  const uploadMedia = async () => {
+    if (!media) return Alert.alert("Error", "Please select a media first.");
+
+    setIsUploading(true);
+    let formData = new FormData();
+    formData.append("file", {
+      uri: media,
+      type: media.endsWith(".mp4") ? "video/mp4" : "image/jpeg",
+      name: `reel.${media.endsWith(".mp4") ? "mp4" : "jpg"}`,
+    });
 
     try {
-      const response = await fetch(`${BACKEND_URL}/createReel`, {
+      const response = await fetch(`${BACKEND_URL}/api/reels`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: user.email,
-          reelUrl: media,
-          desc: desc,
-        }),
+        headers: { "Content-Type": "multipart/form-data" },
+        body: formData,
       });
-
       const data = await response.json();
-      console.log("Successfully created reel:", data.message);
-
-      let prevReels = user.reels;
-      console.log(user);
-      // dispatch(
-      //   storeReels([
-      //     ...prevReels,
-      //     {
-      //       user: user.name,
-      //       reelUrl: media,
-      //       desc: desc,
-      //       dailyLikes: 0,
-      //       totalLikes: 0,
-      //       comments: [],
-      //     },
-      //   ])
-      // );
-      setLoading(false);
-
-      router.push("../account");
+      if (data.success) {
+        dispatch(storeReels(data.reel)); // Store in Redux if needed
+        Alert.alert("Upload Success", "Reel uploaded successfully!");
+      } else {
+        Alert.alert("Upload Failed", data.message);
+      }
     } catch (error) {
-      console.error("Error:", error);
+      Alert.alert("Error", "Failed to upload media.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.headerText}>
-          "Let's make some pawsome content!"
-        </Text>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={pickMedia} style={styles.pickMediaBtn}>
+        <Text style={styles.pickMediaText}>Pick Image/Video</Text>
+      </TouchableOpacity>
 
-        {/* Media Preview */}
-        {media ? (
-          <Image
-            source={{ uri: media }}
+      {media &&
+        (media.type === "video" ? (
+          <Video
+            source={{ uri: media.uri }}
+            style={{ width: 300, height: 300 }}
+            useNativeControls
             resizeMode="contain"
-            style={styles.mediaPreview}
           />
         ) : (
-          <TouchableOpacity
-            onPress={pickMedia}
-            style={styles.selectMediaButton}
-          >
-            <Text style={styles.selectMediaText}>Choose Image or Video</Text>
-          </TouchableOpacity>
-        )}
-        {media && (
-          <TouchableOpacity
-            onPress={pickMedia}
-            style={styles.selectMediaButtonShort}
-          >
-            <Text style={styles.selectMediaText}>
-              Choose other Image or Video
-            </Text>
-          </TouchableOpacity>
-        )}
+          <Image
+            source={{ uri: media.uri }}
+            style={{ width: 300, height: 300 }}
+          />
+        ))}
 
-        {/* desc Textarea */}
-        <TextInput
-          placeholder="Write a catchy caption..."
-          value={desc}
-          onChangeText={setDesc}
-          multiline
-          style={styles.descInput}
-          placeholderTextColor={Colors.subtleText}
-        />
+      <TouchableOpacity onPress={uploadMedia} style={styles.uploadBtn}>
+        <Text style={styles.uploadText}>Upload</Text>
+      </TouchableOpacity>
 
-        {/* Share Button */}
-        <TouchableOpacity
-          onPress={handleShare}
-          style={styles.shareButton}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={Colors.white} />
-          ) : (
-            <Text style={styles.shareButtonText}>Share</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      {isUploading && <ActivityIndicator size="large" color={Colors.primary} />}
+    </View>
   );
-};
-
-export default CreateReel;
+}
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    backgroundColor: Colors.lightPink,
-    alignItems: "center",
-  },
-  container: {
-    backgroundColor: Colors.lightPink,
-    padding: 20,
-    alignItems: "center",
-    overflow: "scroll",
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.darkText,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  selectMediaButton: {
-    backgroundColor: Colors.darkPink,
+  container: { flex: 1, padding: 20 },
+  pickMediaBtn: {
+    backgroundColor: Colors.black,
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    minHeight: 400,
-    width: "100%",
-    backgroundColor: "lightgrey",
-    justifyContent: "center",
+    borderRadius: 5,
     alignItems: "center",
   },
-  selectMediaButtonShort: {
-    backgroundColor: "lightgrey",
+  pickMediaText: { color: "#fff", fontSize: 16 },
+  preview: {
+    width: 800,
+    height: 300,
+    marginVertical: 20,
+    border: "2px solid black",
+  },
+  uploadBtn: {
+    backgroundColor: Colors.black,
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 5,
     alignItems: "center",
-    width: "100%",
-    marginBottom: 20,
   },
-  selectMediaText: {
-    color: "black",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  mediaPreview: {
-    width: "100%",
-    height: 400,
-    borderRadius: 10,
-    marginBottom: 20,
-    resizeMode: "contain",
-  },
-  descInput: {
-    width: "100%",
-    backgroundColor: Colors.lightGrey,
-    color: Colors.darkText,
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    textAlignVertical: "top",
-    height: 100,
-    marginBottom: 20,
-    border: "2px solid lightgrey",
-  },
-  shareButton: {
-    backgroundColor: Colors.red,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    width: "100%",
-  },
-  shareButtonText: {
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  uploadText: { color: "white", fontSize: 16 },
 });

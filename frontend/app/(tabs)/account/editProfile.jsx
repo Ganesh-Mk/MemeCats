@@ -40,19 +40,30 @@ const EditProfile = () => {
 
   const handleEditProfile = async () => {
     setLoading(true);
+
+    // Prepare the form data
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", user.email);
+    if (profileImage) {
+      // Attach image with required metadata for React Native
+      formData.append("profileImage", {
+        uri: profileImage,
+        name: "profileImage.jpg",
+        type: "image/jpeg",
+      });
+    }
+
     try {
       const response = await fetch(`${BACKEND_URL}/editProfile`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email: user.email }),
+        body: formData, // Pass formData directly as the body
       });
 
       const data = await response.json();
-
       if (response.ok) {
         dispatch(storeName(name));
+        dispatch(storeProfileImage(data.user.profileImage));
         Alert.alert("Success", data.message);
         router.push("../account");
       } else {
@@ -72,6 +83,9 @@ const EditProfile = () => {
       aspect: [4, 3],
       quality: 1,
     });
+
+    console.log("Aftre pick: ", result);
+    //Aftre pick:  {"assets": [{"assetId": null, "base64": null, "duration": null, "exif": null, "fileName": "b9f61571-458c-4d9d-9fe4-57e18bb01d3d.jpeg", "fileSize": 57525, "height": 405, "mimeType": "image/jpeg", "rotation": null, "type": "image", "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540ganeshmk%252Ffrontend/ImagePicker/b9f61571-458c-4d9d-9fe4-57e18bb01d3d.jpeg", "width": 540}], "canceled": false}
 
     if (!result.canceled) {
       setProfileImage(result.assets[0].uri); // Get the image URI from the selected result
