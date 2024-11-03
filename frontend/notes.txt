@@ -1,69 +1,110 @@
-  const data = [
-    {
-      reelVideoUrl:
-        "https://videos.pexels.com/video-files/7691954/7691954-uhd_1440_2732_30fps.mp4",
-      dateAndTime: "2024-10-27T12:00:00Z",
-      name: "John Doe",
-      profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-      totalLikes: 120,
-      dailyLikes: 20,
-      comments: [
-        {
-          name: "Jane Smith",
-          profileImage:
-            "https://videos.pexels.com/video-files/28965622/12531382_1440_2560_30fps.mp4",
-          dateAndTime: "2024-10-27T14:00:00Z",
-          text: "Awesome reel!",
-        },
-        {
-          name: "Mike Johnson",
-          profileImage: "https://randomuser.me/api/portraits/men/2.jpg",
-          dateAndTime: "2024-10-27T15:30:00Z",
-          text: "Great vibes!",
-        },
-      ],
-    },
-    {
-      reelVideoUrl:
-        "https://videos.pexels.com/video-files/5345981/5345981-hd_1920_1080_24fps.mp4",
-      dateAndTime: "2024-10-27T13:00:00Z",
-      name: "Emily Clark",
-      profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
-      totalLikes: 200,
-      dailyLikes: 35,
-      comments: [
-        {
-          name: "Alice Brown",
-          profileImage: "https://randomuser.me/api/portraits/women/3.jpg",
-          dateAndTime: "2024-10-27T15:00:00Z",
-          text: "Love this!",
-        },
-      ],
-    },
-    {
-      reelVideoUrl:
-        "https://videos.pexels.com/video-files/6568032/6568032-hd_1920_1080_30fps.mp4",
-      dateAndTime: "2024-10-27T14:00:00Z",
-      name: "Kitty",
-      profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
-      totalLikes: 300,
-      dailyLikes: 50,
-      comments: [
-        {
-          name: "Sarah King",
-          profileImage: "https://randomuser.me/api/portraits/women/4.jpg",
-          dateAndTime: "2024-10-27T16:00:00Z",
-          text: "Wow, this is amazing!",
-        },
-        {
-          name: "Tom Hanks",
-          profileImage: "https://randomuser.me/api/portraits/men/4.jpg",
-          dateAndTime: "2024-10-27T17:00:00Z",
-          text: "Good stuff!",
-        },
-      ],
-    },
-  ];
+======================= Reel scrolling working fine ================================
+import { Dimensions, FlatList, StyleSheet, View } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { Video } from "expo-av";
+import { BACKEND_URL } from "../../../env";
+
+const { height: screenHeight } = Dimensions.get("window");
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 50, // Adjust if necessary
+};
+
+const Reels = () => {
+  const [data, setData] = useState([]);
+  const videoRefs = useRef([]);
+  const [currentIndex, setCurrentIndex] = useState(null);
+
+  async function getData() {
+    const response = await fetch(`${BACKEND_URL}/getAllReels`);
+    const data = await response.json();
+    console.log("Fetched reels data:", data.allReels); // Log the fetched data
+    setData(data.allReels);
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleViewableItemsChanged = ({ viewableItems, changed }) => {
+    console.log("Viewable items changed:", viewableItems);
+
+    let nextPlayingIndex = null;
+
+    changed.forEach((item) => {
+      const videoRef = videoRefs.current[item.index];
+      console.log(`Item ${item.index} visibility: ${item.isViewable}`);
+
+      if (item.isViewable) {
+        // Set the index of the next video to play
+        nextPlayingIndex = item.index;
+      } else if (item.index === currentIndex) {
+        // Stop the currently playing video
+        if (videoRef) {
+          console.log(`Stopping video at index ${item.index}`);
+          videoRef.stopAsync();
+          setCurrentIndex(null); // Reset the current index
+        }
+      }
+    });
+
+    // Play the next video if it's not null and different from the current one
+    if (nextPlayingIndex !== null && nextPlayingIndex !== currentIndex) {
+      const nextVideoRef = videoRefs.current[nextPlayingIndex];
+      if (nextVideoRef) {
+        console.log(`Playing video at index ${nextPlayingIndex}`);
+        nextVideoRef.playAsync();
+        setCurrentIndex(nextPlayingIndex); // Update the current index
+      }
+    }
+  };
+
+  const renderItem = ({ item, index }) => (
+    <View style={styles.container}>
+      <Video
+        ref={(ref) => {
+          videoRefs.current[index] = ref;
+          console.log(`Video ref set for index ${index}`); // Log when ref is set
+        }}
+        source={{ uri: item.reelUrl }}
+        style={styles.video}
+        useNativeControls={false}
+        resizeMode="cover"
+        isLooping
+        shouldPlay={index === currentIndex}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={renderItem}
+      pagingEnabled
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.contentContainerStyle}
+      onViewableItemsChanged={handleViewableItemsChanged}
+      viewabilityConfig={viewabilityConfig}
+    />
+  );
+};
+
+export default Reels;
+
+const styles = StyleSheet.create({
+  container: {
+    width: Dimensions.get("window").width,
+    height: screenHeight,
+    backgroundColor: "black",
+  },
+  video: {
+    width: "100%",
+    height: "100%",
+  },
+  contentContainerStyle: {
+    alignItems: "center",
+  },
+});
 
 
 
