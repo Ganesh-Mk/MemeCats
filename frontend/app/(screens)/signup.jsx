@@ -72,6 +72,7 @@ const Signup = () => {
         dispatch(storeReels([]));
 
         try {
+          await AsyncStorage.clear();
           await AsyncStorage.setItem("id", data.id);
           await AsyncStorage.setItem("name", name);
           await AsyncStorage.setItem("email", email);

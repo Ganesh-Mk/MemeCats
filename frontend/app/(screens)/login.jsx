@@ -78,6 +78,7 @@ const Login = () => {
         dispatch(storeReels(data.user.reels));
 
         try {
+          await AsyncStorage.clear();
           await AsyncStorage.setItem("id", data.user._id);
           await AsyncStorage.setItem("name", data.user.name);
           await AsyncStorage.setItem("email", data.user.email);

@@ -24,6 +24,7 @@ import { BACKEND_URL } from "../../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "../../../constants/Colors";
 import ConfirmationModal from "../../../components/ConfirmationModal";
+import { setRefreshTogglePlayPause } from "../../../store/reel";
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -72,12 +73,13 @@ export default function AccountScreen() {
   };
 
   const logout = async () => {
-    await AsyncStorage.setItem("name", "");
+    await AsyncStorage.clear();
     dispatch(storeId(""));
     dispatch(storeName(""));
     dispatch(storeEmail(""));
     dispatch(storeProfileImage(""));
     dispatch(storeReels([]));
+    dispatch(setRefreshTogglePlayPause(false));
     router.push("../../");
   };
 
