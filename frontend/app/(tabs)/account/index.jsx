@@ -1,3 +1,5 @@
+// pages/account/index.js
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -5,12 +7,9 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Pressable,
   Alert,
 } from "react-native";
-import React, { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
-import Colors from "../../../constants/Colors";
 import { Video } from "expo-av";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -19,26 +18,31 @@ import {
   storeEmail,
   storeProfileImage,
   storeReels,
-  storeRefreshUser,
 } from "../../../store/user";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { BACKEND_URL } from "../../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Colors from "../../../constants/Colors";
+import ConfirmationModal from "../../../components/ConfirmationModal";
 
-export default function index() {
+export default function AccountScreen() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [reelToDelete, setReelToDelete] = useState(null);
+  const [refreshReels, setRefreshReels] = useState(0);
   const { name, email, profileImage, reels } = user;
 
-  const handleDeleteReel = async (reelId) => {
+  const handleDeleteReel = async () => {
+    if (!reelToDelete) return;
     try {
       const response = await fetch(`${BACKEND_URL}/deleteReel`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: user.id, reelId: reelId }),
+        body: JSON.stringify({ userId: user.id, reelId: reelToDelete }),
       });
 
       if (!response.ok) {
@@ -51,14 +55,20 @@ export default function index() {
       }
 
       const data = await response.json();
-      Alert.alert("Successfully Deleted Reel", data.message, [{ text: "OK" }]);
 
-      // Refresh user state
-      dispatch(storeRefreshUser());
+      setRefreshReels(refreshReels + 1);
     } catch (err) {
       console.error("Error in deleteReel function:", err);
-      Alert.alert("An error occurred", "Unable  to delete the reel.");
+      Alert.alert("An error occurred", "Unable to delete the reel.");
+    } finally {
+      setReelToDelete(null); // Clear the reel ID
+      setModalVisible(false); // Hide the modal
     }
+  };
+
+  const confirmDeleteReel = (reelId) => {
+    setReelToDelete(reelId);
+    setModalVisible(true);
   };
 
   const logout = async () => {
@@ -73,14 +83,8 @@ export default function index() {
 
   useEffect(() => {
     const loadAllData = async () => {
-      let email = "";
       try {
-        email = await AsyncStorage.getItem("email");
-      } catch (error) {
-        console.error("Error getting email", error);
-      }
-
-      try {
+        const email = await AsyncStorage.getItem("email");
         const response = await fetch(`${BACKEND_URL}/getUser`, {
           method: "POST",
           headers: {
@@ -96,14 +100,19 @@ export default function index() {
       }
     };
     loadAllData();
-  }, []);
+  }, [refreshReels]);
 
   return (
     <View style={styles.container}>
+      <ConfirmationModal
+        visible={isModalVisible}
+        onConfirm={handleDeleteReel}
+        onCancel={() => setModalVisible(false)}
+      />
       <View style={styles.header}>
         <Text style={styles.headerText}>Account</Text>
         <TouchableOpacity onPress={logout}>
-          <AntDesign name="logout" size={27} color={Colors.red} />
+          <AntDesign name="logout" size={27} color="red" />
         </TouchableOpacity>
       </View>
       <View style={styles.profileInfoContainer}>
@@ -150,48 +159,26 @@ export default function index() {
       <FlatList
         data={reels}
         numColumns={2}
-        keyExtractor={(item) => item._id} // Change to use the reel's _id
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.reelContainer}>
-            <Video
-              source={{ uri: item.reelUrl }}
-              style={styles.reelVideo}
-              useNativeControls
-              resizeMode="contain"
-            />
-            <View style={styles.actionButtons}>
-              <Text style={styles.likeCount}>👍 {item.totalLikes}</Text>
-
-              <TouchableOpacity
-                onPress={() => {
-                  if (item._id) {
-                    handleDeleteReel(item._id);
-                  } else {
-                    console.log("Reel ID is missing for this item:", item);
-                    Alert.alert("Error", "Reel ID is missing");
-                  }
-                }}
-              >
-                <AntDesign
-                  name="delete"
-                  size={20}
-                  style={styles.iconDesign}
-                  color={Colors.red}
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => console.log("Edit")}>
-                <AntDesign
-                  name="edit"
-                  size={20}
-                  style={styles.iconDesign}
-                  color={Colors.darkBlue}
-                />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        )}
+        keyExtractor={(item) => item._id}
         contentContainerStyle={styles.reelGrid}
+        renderItem={({ item }) => (
+          <View style={styles.reelWrapper}>
+            <TouchableOpacity style={styles.reelContainer}>
+              <Video
+                source={{ uri: item.reelUrl }}
+                style={styles.reelVideo}
+                useNativeControls
+                resizeMode="contain"
+              />
+              <View style={styles.reelButtonsBox}>
+                <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>
+                <TouchableOpacity onPress={() => confirmDeleteReel(item._id)}>
+                  <AntDesign name="delete" size={20} color="red" />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
       />
     </View>
   );
@@ -232,7 +219,8 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 10,
     gap: 10,
   },
@@ -250,6 +238,7 @@ const styles = StyleSheet.create({
     color: Colors.darkText,
     marginBottom: 5,
   },
+
   email: {
     fontSize: 18,
     color: Colors.subtleText,
@@ -271,6 +260,15 @@ const styles = StyleSheet.create({
     width: "40%",
     alignItems: "center",
   },
+  reelButtonsBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    gap: 10,
+    width: "100%",
+    paddingHorizontal: 15,
+  },
   btnBox: {
     backgroundColor: Colors.red,
     paddingVertical: 10,
@@ -284,6 +282,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.white,
   },
+  reelWrapper: {
+    width: "50%",
+    padding: 5,
+  },
   reelGrid: {
     paddingTop: 20,
   },
@@ -294,15 +296,15 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: Colors.lightGrey,
     alignItems: "center",
-    padding: 10,
+    padding: 5,
+    borderRadius: 10,
   },
   reelVideo: {
     width: "100%",
-    height: 200,
+    height: 230,
     borderRadius: 10,
   },
   likeCount: {
-    marginTop: 10,
     fontSize: 14,
     color: Colors.darkPink,
   },

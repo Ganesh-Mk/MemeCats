@@ -24,7 +24,6 @@ const createReelRouter = require("./routes/createReel");
 const getAllReelsRouter = require("./routes/getAllReels");
 const getReelRouter = require("./routes/getReel");
 const deleteReelRouter = require("./routes/deleteReel");
-const editReelRouter = require("./routes/editReel");
 const deleteRouter = require("./routes/delete");
 const getUserRouter = require("./routes/getUser");
 
@@ -36,7 +35,6 @@ app.use(createReelRouter);
 app.use(getAllReelsRouter);
 app.use(getReelRouter);
 app.use(deleteReelRouter);
-app.use(editReelRouter);
 app.use(deleteRouter);
 app.use(getUserRouter);
 
@@ -65,7 +63,6 @@ app.post("/login", loginRouter);
 app.post("/createReel", createReelRouter);
 
 app.patch("/editProfile", editProfileRouter);
-app.patch("/editReel", editReelRouter);
 
 app.delete("/deleteUser", deleteUserRouter);
 app.delete("/deleteReel", deleteReelRouter);

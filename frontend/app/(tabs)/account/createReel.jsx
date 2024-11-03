@@ -94,13 +94,21 @@ export default function CreateReel() {
     <View style={styles.container}>
       <Text style={styles.headerText}>Hey Hooman, make me famous! 🐱</Text>
 
-      {media && (
+      {media ? (
         <Video
           source={{ uri: media.uri }}
           style={{ width: 300, height: 300 }}
           useNativeControls
           resizeMode="contain"
         />
+      ) : (
+        <>
+          <View style={{ width: 300, height: 300, backgroundColor: "#ccc" }}>
+            <Text style={{ fontSize: 24, textAlign: "center", marginTop: 100 }}>
+              No Media Selected
+            </Text>
+          </View>
+        </>
       )}
 
       <TouchableOpacity onPress={pickMedia} style={styles.pickMediaBtn}>
