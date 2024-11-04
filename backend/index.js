@@ -26,6 +26,8 @@ const deleteReelRouter = require("./routes/deleteReel");
 const deleteRouter = require("./routes/delete");
 const getUserRouter = require("./routes/getUser");
 const updateReelLikesRouter = require("./routes/updateReelLikes");
+const saveReelRouter = require("./routes/saveReel");
+const deleteSavedReelRouter = require("./routes/deleteSavedReel");
 
 app.use(signupRouter);
 app.use(loginRouter);
@@ -37,6 +39,8 @@ app.use(deleteReelRouter);
 app.use(deleteRouter);
 app.use(getUserRouter);
 app.use(updateReelLikesRouter);
+app.use(saveReelRouter);
+app.use(deleteSavedReelRouter);
 
 const User = require("./models/userModel");
 
@@ -48,7 +52,7 @@ mongoose
   .catch((err) => console.error("Database Connection Failed: ", err));
 
 app.get("/", async (req, res) => {
-  const users = await User.find().populate("reels");
+  const users = await User.find().populate("reels").populate("saveReels");
   res.json(users);
   // res.send("Hello World!");
 });
@@ -62,10 +66,12 @@ app.post("/signup", signupRouter);
 app.post("/login", loginRouter);
 app.post("/createReel", createReelRouter);
 app.post("/updateReelLikes", updateReelLikesRouter);
+app.post("/saveReel", saveReelRouter);
 
 app.patch("/editProfile", editProfileRouter);
 
 app.delete("/deleteReel", deleteReelRouter);
+app.delete("/deleteSavedReel", deleteSavedReelRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema({
     default:
       "https://static-00.iconduck.com/assets.00/cat-symbol-icon-256x256-jqp15brc.png",
   },
+  saveReels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reel",
+    },
+  ],
   reels: [
     {
       type: mongoose.Schema.Types.ObjectId,

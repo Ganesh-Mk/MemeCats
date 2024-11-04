@@ -5,6 +5,7 @@ import {
   View,
   Pressable,
   Text,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { Video } from "expo-av";
@@ -21,6 +22,8 @@ const Reels = () => {
   const reelReducer = useSelector((state) => state.reel);
   const user = useSelector((state) => state.user);
   const [data, setData] = useState([]);
+  const [muted, setMuted] = useState(false);
+
   const videoRefs = useRef([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [paused, setPaused] = useState(false);
@@ -35,6 +38,10 @@ const Reels = () => {
     getData();
   }, []);
 
+  const toggleMute = (index) => {
+    setMuted((prevMuted) => !prevMuted);
+  };
+
   const togglePlayPause = (index) => {
     const videoRef = videoRefs.current[index];
     if (videoRef) {
@@ -46,6 +53,7 @@ const Reels = () => {
       setPaused(!paused);
     }
   };
+
   const togglePlay = (index) => {
     const videoRef = videoRefs.current[index];
     if (videoRef) {
@@ -110,6 +118,36 @@ const Reels = () => {
     });
   };
 
+  const handleReelComments = async (reel) => {
+    console.log("Comment on : ", reel);
+  };
+  const handleReelSave = async (reelId) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/saveReel`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reelId: reelId,
+          userId: user.id,
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert("Reel Saved Successfully", " Your reel has been saved", [
+          { text: "OK" },
+        ]);
+      } else {
+        Alert.alert("Reel Not Saved", " Your reel has not been saved", [
+          { text: "OK" },
+        ]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const renderItem = ({ item, index }) => (
     <View style={styles.container}>
       <Pressable onPress={() => togglePlayPause(index)} style={styles.overlay}>
@@ -123,6 +161,7 @@ const Reels = () => {
           resizeMode="cover"
           isLooping
           shouldPlay={index === currentIndex && !paused}
+          isMuted={muted}
         />
         {/* Bottom overlay items */}
         <View style={styles.bottomOverlay}>
@@ -141,10 +180,30 @@ const Reels = () => {
             />
           </Pressable>
           <Pressable style={styles.iconButton}>
-            <Icon name="comment" size={30} color="white" />
+            <Icon
+              name="comment"
+              onPress={() => handleReelComments(item)}
+              size={30}
+              color="white"
+            />
           </Pressable>
           <Pressable style={styles.iconButton}>
-            <Icon name="share" size={30} color="white" />
+            <Icon
+              name="save"
+              onPress={() => handleReelSave(item._id)}
+              size={30}
+              color="white"
+            />
+          </Pressable>
+          <Pressable
+            style={styles.iconButton}
+            onPress={() => toggleMute(index)}
+          >
+            <Icon
+              name={muted ? "volume-off" : "volume-up"}
+              size={30}
+              color="white"
+            />
           </Pressable>
         </View>
       </Pressable>
