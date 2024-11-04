@@ -10,7 +10,12 @@ import {
 } from "react-native";
 import Colors from "../constants/Colors";
 
-export default function ConfirmationModal({ visible, onConfirm, onCancel }) {
+export default function ConfirmationModal({
+  message,
+  visible,
+  onConfirm,
+  onCancel,
+}) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
 
@@ -60,9 +65,7 @@ export default function ConfirmationModal({ visible, onConfirm, onCancel }) {
             { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
           ]}
         >
-          <Text style={styles.modalText}>
-            Are you sure you want to delete this reel?
-          </Text>
+          <Text style={styles.modalText}>{message}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.confirmButton}

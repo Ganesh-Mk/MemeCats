@@ -31,6 +31,8 @@ export default function AccountScreen() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [onConfirmAction, setOnConfirmAction] = useState(null);
+  const [modalMessage, setModalMessage] = useState("");
   const [reelToDelete, setReelToDelete] = useState(null);
   const [refreshReels, setRefreshReels] = useState(0);
   const { name, email, profileImage, reels } = user;
@@ -62,13 +64,21 @@ export default function AccountScreen() {
       console.error("Error in deleteReel function:", err);
       Alert.alert("An error occurred", "Unable to delete the reel.");
     } finally {
-      setReelToDelete(null); // Clear the reel ID
-      setModalVisible(false); // Hide the modal
+      setReelToDelete(null);
+      setModalVisible(false);
     }
   };
 
   const confirmDeleteReel = (reelId) => {
     setReelToDelete(reelId);
+    setModalMessage("Are you sure you want to delete this reel?");
+    setOnConfirmAction(() => handleDeleteReel); // Set confirm action to delete reel
+    setModalVisible(true);
+  };
+
+  const confirmLogout = () => {
+    setModalMessage("Are you sure you want to logout?");
+    setOnConfirmAction(() => logout); // Set confirm action to logout
     setModalVisible(true);
   };
 
@@ -80,6 +90,7 @@ export default function AccountScreen() {
     dispatch(storeProfileImage(""));
     dispatch(storeReels([]));
     dispatch(setRefreshTogglePlayPause(false));
+    setModalVisible(false);
     router.push("../../");
   };
 
@@ -108,12 +119,13 @@ export default function AccountScreen() {
     <View style={styles.container}>
       <ConfirmationModal
         visible={isModalVisible}
-        onConfirm={handleDeleteReel}
+        message={modalMessage}
+        onConfirm={onConfirmAction}
         onCancel={() => setModalVisible(false)}
       />
       <View style={styles.header}>
         <Text style={styles.headerText}>Account</Text>
-        <TouchableOpacity onPress={logout}>
+        <TouchableOpacity onPress={confirmLogout}>
           <AntDesign name="logout" size={27} color="red" />
         </TouchableOpacity>
       </View>
@@ -161,7 +173,7 @@ export default function AccountScreen() {
       <FlatList
         data={reels}
         numColumns={2}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item, index) => `Account-reel-${index}`}
         contentContainerStyle={styles.reelGrid}
         renderItem={({ item }) => (
           <View style={styles.reelWrapper}>

@@ -19,24 +19,24 @@ app.use(cors(corsOptions));
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
 const editProfileRouter = require("./routes/editProfile");
-const deleteUserRouter = require("./routes/deleteUser");
 const createReelRouter = require("./routes/createReel");
 const getAllReelsRouter = require("./routes/getAllReels");
 const getReelRouter = require("./routes/getReel");
 const deleteReelRouter = require("./routes/deleteReel");
 const deleteRouter = require("./routes/delete");
 const getUserRouter = require("./routes/getUser");
+const updateReelLikesRouter = require("./routes/updateReelLikes");
 
 app.use(signupRouter);
 app.use(loginRouter);
 app.use(editProfileRouter);
-app.use(deleteUserRouter);
 app.use(createReelRouter);
 app.use(getAllReelsRouter);
 app.use(getReelRouter);
 app.use(deleteReelRouter);
 app.use(deleteRouter);
 app.use(getUserRouter);
+app.use(updateReelLikesRouter);
 
 const User = require("./models/userModel");
 
@@ -61,10 +61,10 @@ app.get("/getUser", getUserRouter);
 app.post("/signup", signupRouter);
 app.post("/login", loginRouter);
 app.post("/createReel", createReelRouter);
+app.post("/updateReelLikes", updateReelLikesRouter);
 
 app.patch("/editProfile", editProfileRouter);
 
-app.delete("/deleteUser", deleteUserRouter);
 app.delete("/deleteReel", deleteReelRouter);
 
 const PORT = process.env.PORT || 5000;

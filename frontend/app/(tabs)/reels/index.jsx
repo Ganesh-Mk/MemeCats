@@ -4,10 +4,12 @@ import {
   StyleSheet,
   View,
   Pressable,
+  Text,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { Video } from "expo-av";
 import { BACKEND_URL } from "../../../env";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useSelector } from "react-redux";
 
 const { height: screenHeight } = Dimensions.get("window");
@@ -17,10 +19,11 @@ const viewabilityConfig = {
 
 const Reels = () => {
   const reelReducer = useSelector((state) => state.reel);
+  const user = useSelector((state) => state.user);
   const [data, setData] = useState([]);
   const videoRefs = useRef([]);
   const [currentIndex, setCurrentIndex] = useState(null);
-  const [paused, setPaused] = useState(false); // State for toggling play/pause
+  const [paused, setPaused] = useState(false);
 
   async function getData() {
     const response = await fetch(`${BACKEND_URL}/getAllReels`);
@@ -40,7 +43,7 @@ const Reels = () => {
       } else {
         videoRef.pauseAsync();
       }
-      setPaused(!paused); // Toggle paused state
+      setPaused(!paused);
     }
   };
   const togglePlay = (index) => {
@@ -89,6 +92,24 @@ const Reels = () => {
     }
   };
 
+  const handleReelLiked = async (reel) => {
+    reel.totalLikes += 1;
+    reel.dailyLikes += 1;
+    console.log("Liked: ", reel.totalLikes);
+
+    const response = await fetch(`${BACKEND_URL}/updateReelLikes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reelId: reel._id,
+        totalLikes: reel.totalLikes,
+        dailyLikes: reel.dailyLikes,
+      }),
+    });
+  };
+
   const renderItem = ({ item, index }) => (
     <View style={styles.container}>
       <Pressable onPress={() => togglePlayPause(index)} style={styles.overlay}>
@@ -103,6 +124,29 @@ const Reels = () => {
           isLooping
           shouldPlay={index === currentIndex && !paused}
         />
+        {/* Bottom overlay items */}
+        <View style={styles.bottomOverlay}>
+          <Text style={styles.username}>@username</Text>
+          <Text style={styles.description}>Description of the video...</Text>
+        </View>
+
+        {/* Right-side overlay items */}
+        <View style={styles.rightOverlay}>
+          <Pressable style={styles.iconButton}>
+            <Icon
+              name="heart"
+              onPress={() => handleReelLiked(item)}
+              size={30}
+              color="white"
+            />
+          </Pressable>
+          <Pressable style={styles.iconButton}>
+            <Icon name="comment" size={30} color="white" />
+          </Pressable>
+          <Pressable style={styles.iconButton}>
+            <Icon name="share" size={30} color="white" />
+          </Pressable>
+        </View>
       </Pressable>
     </View>
   );
@@ -110,7 +154,7 @@ const Reels = () => {
   return (
     <FlatList
       data={data}
-      keyExtractor={(item) => item._id}
+      keyExtractor={(item, index) => `${item._id}-${index}`}
       renderItem={renderItem}
       pagingEnabled
       showsVerticalScrollIndicator={false}
@@ -139,5 +183,29 @@ const styles = StyleSheet.create({
   },
   contentContainerStyle: {
     alignItems: "center",
+  },
+  bottomOverlay: {
+    position: "absolute",
+    bottom: 20,
+    left: 10,
+  },
+  username: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  description: {
+    color: "white",
+    fontSize: 16,
+    marginTop: 5,
+  },
+  rightOverlay: {
+    position: "absolute",
+    right: 10,
+    bottom: 100,
+    alignItems: "center",
+  },
+  iconButton: {
+    marginVertical: 10,
   },
 });
