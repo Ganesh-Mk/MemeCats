@@ -60,7 +60,7 @@ export default function CreateReel() {
 
     setIsUploading(true);
     let formData = new FormData();
-    console.log("user.id: ", user);
+    console.log("user: ", user);
     formData.append("user", user.id); // Add title to formData
     formData.append("description", desc); // Add description to formData
     formData.append("file", {
@@ -77,14 +77,16 @@ export default function CreateReel() {
       });
       const data = await response.json();
       if (data.success) {
-        dispatch(storeReels(data.reel)); // Store in Redux if needed
+        dispatch(storeReels(data.reel));
         dispatch(storeRefreshUser());
         router.push("../account");
       } else {
         Alert.alert("Upload Failed", data.message, [{ text: "OK" }]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to upload media.", [{ text: "OK" }]);
+      Alert.alert("Error", "Failed to upload. Try smaller size media", [
+        { text: "OK" },
+      ]);
     } finally {
       setIsUploading(false);
     }

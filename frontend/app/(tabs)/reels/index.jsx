@@ -7,7 +7,7 @@ import {
   Text,
   Alert,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Video } from "expo-av";
 import { BACKEND_URL } from "../../../env";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -38,14 +38,14 @@ const Reels = () => {
     getData();
   }, []);
 
-  const toggleMute = (index) => {
+  const toggleMute = useCallback(() => {
     setMuted((prevMuted) => !prevMuted);
-  };
+  }, []);
 
   const togglePlayPause = (index) => {
     const videoRef = videoRefs.current[index];
     if (videoRef) {
-      if (paused) {
+      if (paused && reelReducer.refreshTogglePlayPause) {
         videoRef.playAsync();
       } else {
         videoRef.pauseAsync();
@@ -78,27 +78,30 @@ const Reels = () => {
     }
   }, [reelReducer]);
 
-  const handleViewableItemsChanged = ({ viewableItems, changed }) => {
-    let nextPlayingIndex = null;
-    changed.forEach((item) => {
-      const videoRef = videoRefs.current[item.index];
-      if (item.isViewable) {
-        nextPlayingIndex = item.index;
-      } else if (item.index === currentIndex && videoRef) {
-        videoRef.stopAsync();
-        setCurrentIndex(null);
-      }
-    });
+  const handleViewableItemsChanged = useCallback(
+    ({ viewableItems, changed }) => {
+      let nextPlayingIndex = null;
+      changed.forEach((item) => {
+        const videoRef = videoRefs.current[item.index];
+        if (item.isViewable) {
+          nextPlayingIndex = item.index;
+        } else if (item.index === currentIndex && videoRef) {
+          videoRef.stopAsync();
+          setCurrentIndex(null);
+        }
+      });
 
-    if (nextPlayingIndex !== null && nextPlayingIndex !== currentIndex) {
-      const nextVideoRef = videoRefs.current[nextPlayingIndex];
-      if (nextVideoRef) {
-        nextVideoRef.playAsync();
-        setPaused(false); // Ensure play state resets
-        setCurrentIndex(nextPlayingIndex);
+      if (nextPlayingIndex !== null && nextPlayingIndex !== currentIndex) {
+        const nextVideoRef = videoRefs.current[nextPlayingIndex];
+        if (nextVideoRef) {
+          nextVideoRef.playAsync();
+          setPaused(false);
+          setCurrentIndex(nextPlayingIndex);
+        }
       }
-    }
-  };
+    },
+    [currentIndex, videoRefs, setPaused]
+  );
 
   const handleReelLiked = async (reel) => {
     reel.totalLikes += 1;
@@ -227,7 +230,6 @@ const Reels = () => {
 };
 
 export default Reels;
-
 const styles = StyleSheet.create({
   container: {
     width: Dimensions.get("window").width,

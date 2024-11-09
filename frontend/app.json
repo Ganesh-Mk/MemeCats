@@ -28,7 +28,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": ""
+      "favicon": "./assets/images/memeCats/logo.jpg"
     },
     "plugins": [
       "expo-router",
