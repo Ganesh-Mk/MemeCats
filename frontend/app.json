@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "MemeCats",
-    "slug": "MemeCats",
+    "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/memeCats/logo.jpg",
+    "icon": "./assets/images/memeCats/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/memeCats/logo.jpg",
+      "image": "./assets/images/memeCats/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/memeCats/logo.jpg",
+        "foregroundImage": "./assets/images/memeCats/logo.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -28,7 +28,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/memeCats/logo.jpg"
+      "favicon": "./assets/images/memeCats/logo.png"
     },
     "plugins": [
       "expo-router",
