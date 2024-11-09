@@ -215,11 +215,13 @@ const Reels = () => {
       data={data}
       keyExtractor={(item, index) => `${item._id}-${index}`}
       renderItem={renderItem}
+      snapToInterval={screenHeight * 1.0}
+      decelerationRate="fast"
       pagingEnabled
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.contentContainerStyle}
       onViewableItemsChanged={handleViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
+      contentContainerStyle={styles.contentContainerStyle}
     />
   );
 };
@@ -229,19 +231,20 @@ export default Reels;
 const styles = StyleSheet.create({
   container: {
     width: Dimensions.get("window").width,
-    height: screenHeight,
+    height: screenHeight, // Ensure full screen height for each item
     backgroundColor: "black",
   },
   video: {
     width: "100%",
-    height: screenHeight,
+    height: "100%", // Make sure the video fills the container
   },
   overlay: {
     width: "100%",
     height: "100%",
+    position: "relative", // Ensure it doesn't push content down
   },
   contentContainerStyle: {
-    alignItems: "center",
+    padding: 0,
   },
   bottomOverlay: {
     position: "absolute",

@@ -9,12 +9,11 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const corsOptions = {
-  origin: ["http://192.168.1.6:8081"],
+  origin: [process.env.FRONTEND_URL, process.env.BACKEND_URL],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "multipart/form-data"],
 };
 app.use(cors(corsOptions));
-// app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 const signupRouter = require("./routes/signup");
 const loginRouter = require("./routes/login");
@@ -47,7 +46,7 @@ const User = require("./models/userModel");
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("Database Connected: ", process.env.MONGODB_URI);
+    console.log("Database Connected ");
   })
   .catch((err) => console.error("Database Connection Failed: ", err));
 
