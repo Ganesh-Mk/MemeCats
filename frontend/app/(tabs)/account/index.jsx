@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Colors from "../../../constants/Colors";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import { setRefreshTogglePlayPause } from "../../../store/reel";
+import CatButton from "../../../components/CatButton";
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -34,11 +35,14 @@ export default function AccountScreen() {
   const [onConfirmAction, setOnConfirmAction] = useState(null);
   const [modalMessage, setModalMessage] = useState("");
   const [reelToDelete, setReelToDelete] = useState(null);
+  const [buttonLoader, setButtonLoader] = useState(false);
   const [refreshReels, setRefreshReels] = useState(0);
   const { name, email, profileImage, reels } = user;
 
   const handleDeleteReel = async () => {
     if (!reelToDelete) return;
+
+    setButtonLoader(true);
     try {
       const response = await fetch(`${BACKEND_URL}/deleteReel`, {
         method: "DELETE",
@@ -57,9 +61,8 @@ export default function AccountScreen() {
         return;
       }
 
-      const data = await response.json();
-
       setRefreshReels(refreshReels + 1);
+      setButtonLoader(false);
     } catch (err) {
       console.error("Error in deleteReel function:", err);
       Alert.alert("An error occurred", "Unable to delete the reel.");
@@ -119,6 +122,7 @@ export default function AccountScreen() {
     <View style={styles.container}>
       <ConfirmationModal
         visible={isModalVisible}
+        loader={buttonLoader}
         message={modalMessage}
         onConfirm={onConfirmAction}
         onCancel={() => setModalVisible(false)}
@@ -131,11 +135,11 @@ export default function AccountScreen() {
       </View>
       <View style={styles.profileInfoContainer}>
         <Image
-          source={{
-            uri:
-              profileImage ||
-              "https://static-00.iconduck.com/assets.00/cat-symbol-icon-256x256-jqp15brc.png",
-          }}
+          source={
+            profileImage
+              ? { uri: profileImage }
+              : require("../../../assets/images/memeCats/noProfileImage.png")
+          }
           style={styles.profileImage}
         />
         <View style={styles.profileDetails}>
@@ -145,24 +149,22 @@ export default function AccountScreen() {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+        <CatButton
+          text="Create Reel"
           onPress={() => router.push("../account/createReel")}
-          style={styles.btnBox}
-        >
-          <Text style={styles.btnText}>Create Reel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+          width={130}
+        />
+        <CatButton
+          text="Edit Profile"
           onPress={() => router.push("../account/editProfile")}
-          style={styles.btnBox}
-        >
-          <Text style={styles.btnText}>Edit Profile</Text>
-        </TouchableOpacity>
+          width={130}
+        />
         <TouchableOpacity
           onPress={() => router.push("../account/savedReel")}
           style={styles.btnBox}
         >
           <Image
-            style={{ width: 30, height: "100%" }}
+            style={{ width: 25, height: "100%" }}
             source={{
               uri: "https://cdn.iconscout.com/icon/free/png-256/free-save-logo-icon-download-in-svg-png-gif-file-formats--instagram-social-media-brand-filled-line-pack-logos-icons-2724646.png?f=webp&w=256",
             }}

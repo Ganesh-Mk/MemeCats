@@ -17,15 +17,18 @@ import { storeReels, storeRefreshUser } from "../../../store/user.js";
 import { Image } from "react-native";
 import { Video } from "expo-av";
 import { router } from "expo-router";
+import CatButton from "../../../components/CatButton";
 
 export default function CreateReel() {
   const [media, setMedia] = useState(null); // holds the image or video URI
   const [isUploading, setIsUploading] = useState(false);
+  const [loaderSelecting, setLoaderSelecting] = useState(false);
   const [desc, setDesc] = useState("");
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
   const pickMedia = async () => {
+    setLoaderSelecting(true);
     // Request permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -42,6 +45,8 @@ export default function CreateReel() {
       quality: 1,
     });
 
+    setLoaderSelecting(false);
+
     // Check if media is not canceled and get the URI
     if (!result.canceled) {
       const selectedMedia = result.assets[0];
@@ -53,10 +58,15 @@ export default function CreateReel() {
   };
 
   const uploadMedia = async () => {
-    if (!media)
-      return Alert.alert("Error", "Please select a media first.", {
-        text: "OK",
-      });
+    console.log("Came inside uploadMedia");
+
+    if (!media || !desc || media === null) {
+      console.log("Came inside no media");
+      Alert.alert("Upload Failed", "Please select media.", [{ text: "OK" }]);
+      return;
+    }
+
+    console.log("Came inside yes media");
 
     setIsUploading(true);
     let formData = new FormData();
@@ -93,45 +103,47 @@ export default function CreateReel() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>Hey Hooman, make me famous! 🐱</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.headerText}>Hey Hooman, make me famous! 🐱</Text>
 
-      {media ? (
-        <Video
-          source={{ uri: media.uri }}
-          style={{ width: 300, height: 300 }}
-          useNativeControls
-          resizeMode="contain"
-        />
-      ) : (
-        <>
-          <View style={{ width: 300, height: 300, backgroundColor: "#ccc" }}>
-            <Text style={{ fontSize: 24, textAlign: "center", marginTop: 100 }}>
-              No Media Selected
-            </Text>
+        {loaderSelecting ? (
+          <View style={styles.mediaBox}>
+            <ActivityIndicator size="large" color={Colors.red} />
+            <Text style={styles.mediaText}>Opening Gallery</Text>
           </View>
-        </>
-      )}
-
-      <TouchableOpacity onPress={pickMedia} style={styles.pickMediaBtn}>
-        <Text style={styles.pickMediaText}>Select Video/Reel</Text>
-      </TouchableOpacity>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Add a description"
-        value={desc}
-        onChangeText={setDesc}
-      />
-
-      <TouchableOpacity onPress={uploadMedia} style={styles.uploadBtn}>
-        {isUploading ? (
-          <ActivityIndicator size="large" color={Colors.primary} />
+        ) : media ? (
+          <TouchableOpacity onPress={pickMedia}>
+            <Video
+              source={{ uri: media.uri }}
+              style={{ width: 300, height: 300, marginBottom: 20 }}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         ) : (
-          <Text style={styles.uploadText}>Upload</Text>
+          <TouchableOpacity onPress={pickMedia}>
+            <View style={styles.mediaBox}>
+              <Text style={styles.mediaText}>Select Reel</Text>
+            </View>
+          </TouchableOpacity>
         )}
-      </TouchableOpacity>
-    </View>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Add a description"
+          value={desc}
+          multiline={true}
+          onChangeText={setDesc}
+        />
+
+        <CatButton
+          text="Upload"
+          loading={isUploading}
+          onPress={uploadMedia}
+          width={"100%"}
+        />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -163,10 +175,26 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
+    height: 100,
+    fontSize: 20,
     paddingHorizontal: 15,
     marginBottom: 15,
     width: "100%",
     backgroundColor: "#fff",
+  },
+  mediaBox: {
+    width: 300,
+    height: 300,
+    backgroundColor: Colors.lightGrey,
+    borderRadius: 20,
+    marginBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mediaText: {
+    fontSize: 20,
+    fontWeight: "Regular",
+    color: Colors.black,
   },
   uploadBtn: {
     backgroundColor: Colors.red,

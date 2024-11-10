@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import Colors from "../constants/Colors";
 
@@ -15,6 +17,7 @@ export default function ConfirmationModal({
   visible,
   onConfirm,
   onCancel,
+  loader,
 }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
@@ -65,6 +68,10 @@ export default function ConfirmationModal({
             { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
           ]}
         >
+          <Image
+            source={require("../assets/images/memeCats/sideEyeCat2.png")}
+            style={styles.noReelsImage}
+          />
           <Text style={styles.modalText}>{message}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -73,7 +80,12 @@ export default function ConfirmationModal({
               onPressOut={() => handlePressOut(scaleAnim)}
               onPress={onConfirm}
             >
-              <Text style={styles.buttonText}>Yes</Text>
+              {/* <Text style={styles.buttonText}>Yes</Text> */}
+              {loader ? (
+                <ActivityIndicator size="large" color={Colors.white} />
+              ) : (
+                <Text style={styles.buttonText}>Yes</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.cancelButton}
@@ -115,6 +127,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+  },
+  noReelsImage: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+    marginBottom: 20,
   },
   confirmButton: {
     padding: 10,

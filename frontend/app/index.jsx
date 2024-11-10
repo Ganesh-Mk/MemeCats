@@ -1,5 +1,5 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import Colors from "../constants/Colors";
 import { Link, router } from "expo-router";
 import { useDispatch } from "react-redux";
@@ -12,14 +12,31 @@ import {
   storeRefreshUser,
 } from "../store/user.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CatButton from "../components/CatButton";
+import { Audio } from "expo-av";
 
 const Entrance = () => {
   const dispatch = useDispatch();
+  const [sound, setSound] = useState(null);
+  const playSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/audio/happy-happy-cat.mp3"),
+      { shouldPlay: true, isLooping: true }
+    );
+    await sound.playAsync();
+  };
+  const stopSound = async () => {
+    if (sound) {
+      await sound.stopAsync(); // Stop the sound
+      setSound(null); // Clear the sound state
+    }
+  };
+
   async function autoLogin() {
     const name = await AsyncStorage.getItem("name");
-    console.log("name=======  : ", name);
     if (name === "" || name === null || name === undefined) {
-      console.log("Logout out/ new User");
+      console.log("Logout user / new User");
+      playSound();
     } else {
       setTimeout(() => router.push("./(tabs)/account"), 0);
       dispatch(storeId(await AsyncStorage.getItem("id")));
@@ -47,9 +64,16 @@ const Entrance = () => {
         Get ready for a pawsome ride through the funniest, sassiest cat memes
         ever
       </Text>
-      <Link href="./(screens)/loginOrSingup" style={styles.btnBox}>
+      {/* <Link href="" style={styles.btnBox}>
         <Text style={styles.btnText}>Let's Get Started 😻</Text>
-      </Link>
+      </Link> */}
+
+      <CatButton
+        text="Let's Get Started 😻"
+        fontFamily={"Bold"}
+        fontSize={25}
+        onPress={() => router.push("./(screens)/loginOrSingup")}
+      />
     </View>
   );
 };
@@ -63,6 +87,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.pink,
     height: "100%",
+    padding: 20,
   },
   name: {
     fontSize: 18,
@@ -95,7 +120,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Regular",
     textAlign: "center",
-    marginTop: 20,
+    marginVertical: 20,
     color: Colors.black,
   },
   image: {

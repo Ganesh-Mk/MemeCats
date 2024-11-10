@@ -24,6 +24,7 @@ import {
 } from "../../store/user.js";
 import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CatButton from "../../components/CatButton";
 
 const images = {
   login: require("../../assets/gif/kissCat.gif"),
@@ -137,13 +138,19 @@ const Login = () => {
           onChangeText={setPassword}
         />
 
-        <TouchableOpacity style={styles.btnBox} onPress={handleSubmit}>
+        {/* <TouchableOpacity style={styles.btnBox} onPress={handleSubmit}>
           {loading ? (
             <ActivityIndicator color={Colors.white} />
           ) : (
             <Text style={styles.btnText}>Submit Meow!</Text>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+        <CatButton
+          text="Submit Meow!"
+          onPress={handleSubmit}
+          loading={loading}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -204,21 +211,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: Colors.black,
     textAlign: "center",
-  },
-  btnBox: {
-    marginTop: 20,
-    backgroundColor: Colors.red,
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderRadius: 10,
-    width: 300,
-  },
-  btnText: {
-    fontFamily: "Bold",
-    fontSize: 25,
-    textAlign: "center",
-    color: Colors.white,
   },
 });

@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   Image,
   Alert,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -15,6 +17,7 @@ import Colors from "../../../constants/Colors";
 import { storeName, storeProfileImage } from "../../../store/user";
 import { BACKEND_URL } from "../../../env";
 import { router } from "expo-router";
+import CatButton from "../../../components/CatButton";
 
 const EditProfile = () => {
   const user = useSelector((state) => state.user);
@@ -65,7 +68,6 @@ const EditProfile = () => {
       if (response.ok) {
         dispatch(storeName(name));
         dispatch(storeProfileImage(data.user.profileImage));
-        Alert.alert("Success", data.message, [{ text: "OK" }]);
         router.push("../account");
       } else {
         throw new Error(data.message);
@@ -83,48 +85,43 @@ const EditProfile = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
     });
 
-    console.log("Aftre pick: ", result);
-    //Aftre pick:  {"assets": [{"assetId": null, "base64": null, "duration": null, "exif": null, "fileName": "b9f61571-458c-4d9d-9fe4-57e18bb01d3d.jpeg", "fileSize": 57525, "height": 405, "mimeType": "image/jpeg", "rotation": null, "type": "image", "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540ganeshmk%252Ffrontend/ImagePicker/b9f61571-458c-4d9d-9fe4-57e18bb01d3d.jpeg", "width": 540}], "canceled": false}
-
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri); // Get the image URI from the selected result
+      setProfileImage(result.assets[0].uri);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>Purr-fect your profile, hooman!</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.headerText}>Purr-fect your profile, hooman!</Text>
 
-      <TouchableOpacity onPress={pickImage}>
-        <Image
-          source={{
-            uri: profileImage || "https://example.com/defaultProfileImage.jpg",
-          }}
-          style={styles.profileImage}
+        <TouchableOpacity onPress={pickImage}>
+          <Image
+            source={
+              profileImage
+                ? { uri: profileImage }
+                : require("../../../assets/images/memeCats/noProfileImage.png")
+            }
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
         />
-      </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      <TouchableOpacity
-        style={styles.btnBox}
-        onPress={handleEditProfile}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={styles.btnText}>Save Changes</Text>
-        )}
-      </TouchableOpacity>
-    </View>
+        <CatButton
+          text="Save Changes"
+          loading={loading}
+          onPress={handleEditProfile}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -155,6 +152,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
+    fontSize: 20,
     paddingHorizontal: 15,
     marginBottom: 15,
     backgroundColor: "#fff",

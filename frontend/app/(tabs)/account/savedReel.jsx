@@ -5,6 +5,8 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Video } from "expo-av";
@@ -12,13 +14,20 @@ import { AntDesign } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
 import { BACKEND_URL } from "../../../env";
 import { useSelector } from "react-redux";
+import ConfirmationModal from "../../../components/ConfirmationModal";
 
 const SavedReel = ({ email }) => {
   const [savedReels, setSavedReels] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [buttonLoader, setButtonLoader] = useState(false);
+  const [reelIdToDelete, setReelIdToDelete] = useState(null);
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchUser = async () => {
+      setLoader(true);
       try {
         const response = await fetch(`${BACKEND_URL}/getUser`, {
           method: "POST",
@@ -36,6 +45,7 @@ const SavedReel = ({ email }) => {
 
         if (data.user) {
           setSavedReels(data.user.saveReels);
+          setLoader(false);
         } else {
           console.error("User not found");
         }
@@ -48,21 +58,18 @@ const SavedReel = ({ email }) => {
   }, [email, user.email]);
 
   const confirmDeleteReel = (reelId) => {
-    Alert.alert(
-      "Unsave Reel",
-      "Are you sure you want to remove this reel from save collection?",
-      [
-        {
-          text: "No",
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => handleDeleteReel(reelId),
-        },
-      ],
-      { cancelable: false }
+    setReelIdToDelete(reelId);
+    setModalVisible(true);
+    setModalMessage(
+      "Are you sure you want to remove this reel from saved reels?"
     );
+  };
+
+  const onConfirmAction = async () => {
+    setButtonLoader(true);
+    await handleDeleteReel(reelIdToDelete);
+    setButtonLoader(false);
+    setModalVisible(false);
   };
 
   const handleDeleteReel = async (reelId) => {
@@ -90,30 +97,54 @@ const SavedReel = ({ email }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Saved Reels</Text>
-      <FlatList
-        data={savedReels}
-        numColumns={2}
-        keyExtractor={(item, index) => `SavedReel-${index}`}
-        contentContainerStyle={styles.reelGrid}
-        renderItem={({ item }) => (
-          <View style={styles.reelWrapper}>
-            <TouchableOpacity style={styles.reelContainer}>
-              <Video
-                source={{ uri: item.reelUrl }}
-                style={styles.reelVideo}
-                useNativeControls
-                resizeMode="contain"
-              />
-              <View style={styles.reelButtonsBox}>
-                <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>
-                <TouchableOpacity onPress={() => confirmDeleteReel(item._id)}>
-                  <AntDesign name="delete" size={20} color="red" />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
+      <Text style={styles.headerText}>Meow-ments You've Saved</Text>
+      {loader ? (
+        <ActivityIndicator
+          size="large"
+          style={{ marginTop: 20 }}
+          color={Colors.lightPink}
+        />
+      ) : savedReels.length === 0 ? (
+        <View style={styles.noReelsContainer}>
+          <Image
+            source={require("../../../assets/images/memeCats/logo.png")}
+            style={styles.noReelsImage}
+          />
+          <Text style={styles.noReelsText}>No saved reels</Text>
+          <Text style={styles.noReelsText}>Hooman!</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={savedReels}
+          numColumns={2}
+          keyExtractor={(item, index) => `SavedReel-${index}`}
+          contentContainerStyle={styles.reelGrid}
+          renderItem={({ item }) => (
+            <View style={styles.reelWrapper}>
+              <TouchableOpacity style={styles.reelContainer}>
+                <Video
+                  source={{ uri: item.reelUrl }}
+                  style={styles.reelVideo}
+                  useNativeControls
+                  resizeMode="contain"
+                />
+                <View style={styles.reelButtonsBox}>
+                  <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>
+                  <TouchableOpacity onPress={() => confirmDeleteReel(item._id)}>
+                    <AntDesign name="delete" size={20} color="red" />
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
+      <ConfirmationModal
+        visible={isModalVisible}
+        message={modalMessage}
+        loader={buttonLoader}
+        onConfirm={() => onConfirmAction()}
+        onCancel={() => setModalVisible(false)}
       />
     </View>
   );
@@ -140,6 +171,19 @@ const styles = StyleSheet.create({
   },
   reelGrid: {
     paddingTop: 20,
+  },
+  noReelsImage: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+  },
+  noReelsContainer: {
+    marginTop: 50,
+    alignItems: "center",
+  },
+  noReelsText: {
+    fontFamily: "Bold",
+    fontSize: 20,
   },
   reelContainer: {
     flex: 1,
