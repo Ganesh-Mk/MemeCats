@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import Colors from "../constants/Colors";
 import { Link, router } from "expo-router";
@@ -38,7 +45,7 @@ const Entrance = () => {
   async function autoLogin() {
     const name = await AsyncStorage.getItem("name");
     if (name === "" || name === null || name === undefined) {
-      console.log("Logout user / new User");
+      console.log("Logout user or new User");
       playSound();
     } else {
       stopSound();

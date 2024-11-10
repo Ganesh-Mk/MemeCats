@@ -10,15 +10,14 @@
     "splash": {
       "image": "./assets/images/memeCats/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/memeCats/logo.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/memeCats/logo.png"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
