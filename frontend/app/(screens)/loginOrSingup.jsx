@@ -1,7 +1,8 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import CatButton from "../../components/CatButton";
 
 const LoginOrSignup = () => {
   return (
@@ -11,13 +12,21 @@ const LoginOrSignup = () => {
         style={styles.image}
       />
 
-      <Link href="../(screens)/signup" style={styles.btnBox}>
-        <Text style={styles.btnText}>Meow Up</Text>
-      </Link>
-      <Text style={styles.subText}>OR</Text>
-      <Link href="../(screens)/login" style={styles.btnBox}>
-        <Text style={styles.btnText}>Meow In</Text>
-      </Link>
+      <CatButton
+        fontFamily={"Bold"}
+        fontSize={25}
+        text="Meow Up"
+        onPress={() => router.push("../(screens)/signup")}
+      />
+
+      <Text style={styles.subText}>-- OR --</Text>
+
+      <CatButton
+        fontFamily={"Bold"}
+        fontSize={25}
+        text="Meow In"
+        onPress={() => router.push("../(screens)/login")}
+      />
     </View>
   );
 };
@@ -31,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.pink,
     height: "100%",
-    padding: "2rem",
+    padding: 20,
   },
 
   subText: {

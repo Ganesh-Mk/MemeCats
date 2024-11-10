@@ -18,6 +18,7 @@ export default function ConfirmationModal({
   onConfirm,
   onCancel,
   loader,
+  button,
 }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
@@ -73,29 +74,40 @@ export default function ConfirmationModal({
             style={styles.noReelsImage}
           />
           <Text style={styles.modalText}>{message}</Text>
-          <View style={styles.buttonContainer}>
+          {button ? (
             <TouchableOpacity
-              style={styles.confirmButton}
+              style={styles.newConfirmButton}
               onPressIn={() => handlePressIn(scaleAnim)}
               onPressOut={() => handlePressOut(scaleAnim)}
               onPress={onConfirm}
             >
-              {/* <Text style={styles.buttonText}>Yes</Text> */}
-              {loader ? (
-                <ActivityIndicator size="large" color={Colors.white} />
-              ) : (
-                <Text style={styles.buttonText}>Yes</Text>
-              )}
+              <Text style={styles.buttonText}>{button}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPressIn={() => handlePressIn(scaleAnim)}
-              onPressOut={() => handlePressOut(scaleAnim)}
-              onPress={onCancel}
-            >
-              <Text style={styles.noButtonText}>No</Text>
-            </TouchableOpacity>
-          </View>
+          ) : (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPressIn={() => handlePressIn(scaleAnim)}
+                onPressOut={() => handlePressOut(scaleAnim)}
+                onPress={onConfirm}
+              >
+                {/* <Text style={styles.buttonText}>Yes</Text> */}
+                {loader ? (
+                  <ActivityIndicator size="large" color={Colors.white} />
+                ) : (
+                  <Text style={styles.buttonText}>Yes</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPressIn={() => handlePressIn(scaleAnim)}
+                onPressOut={() => handlePressOut(scaleAnim)}
+                onPress={onCancel}
+              >
+                <Text style={styles.noButtonText}>No</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </Animated.View>
       </View>
     </Modal>
@@ -140,6 +152,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 100,
   },
+  newConfirmButton: {
+    padding: 10,
+    backgroundColor: Colors.red,
+    borderRadius: 10,
+    width: "100%",
+  },
   cancelButton: {
     padding: 10,
     borderRadius: 10,
@@ -153,6 +171,7 @@ const styles = StyleSheet.create({
     fontFamily: "Bold",
     fontSize: 20,
   },
+
   noButtonText: {
     color: Colors.black,
     textAlign: "center",

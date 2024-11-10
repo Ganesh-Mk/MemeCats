@@ -1,356 +1,67 @@
-======================= Reel scrolling working fine ================================
-import { Dimensions, FlatList, StyleSheet, View } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
-import { Video } from "expo-av";
-import { BACKEND_URL } from "../../../env";
+ const handleSubmit = async () => {
+    // router.push("../(tabs)/reels");
 
-const { height: screenHeight } = Dimensions.get("window");
-const viewabilityConfig = {
-  itemVisiblePercentThreshold: 50, // Adjust if necessary
-};
-
-const Reels = () => {
-  const [data, setData] = useState([]);
-  const videoRefs = useRef([]);
-  const [currentIndex, setCurrentIndex] = useState(null);
-
-  async function getData() {
-    const response = await fetch(`${BACKEND_URL}/getAllReels`);
-    const data = await response.json();
-    console.log("Fetched reels data:", data.allReels); // Log the fetched data
-    setData(data.allReels);
-  }
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const handleViewableItemsChanged = ({ viewableItems, changed }) => {
-    console.log("Viewable items changed:", viewableItems);
-
-    let nextPlayingIndex = null;
-
-    changed.forEach((item) => {
-      const videoRef = videoRefs.current[item.index];
-      console.log(`Item ${item.index} visibility: ${item.isViewable}`);
-
-      if (item.isViewable) {
-        // Set the index of the next video to play
-        nextPlayingIndex = item.index;
-      } else if (item.index === currentIndex) {
-        // Stop the currently playing video
-        if (videoRef) {
-          console.log(`Stopping video at index ${item.index}`);
-          videoRef.stopAsync();
-          setCurrentIndex(null); // Reset the current index
-        }
-      }
-    });
-
-    // Play the next video if it's not null and different from the current one
-    if (nextPlayingIndex !== null && nextPlayingIndex !== currentIndex) {
-      const nextVideoRef = videoRefs.current[nextPlayingIndex];
-      if (nextVideoRef) {
-        console.log(`Playing video at index ${nextPlayingIndex}`);
-        nextVideoRef.playAsync();
-        setCurrentIndex(nextPlayingIndex); // Update the current index
-      }
+    if (!email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "All fields are required",
+        text2: "Please fill in all the fields",
+      });
+      return;
     }
-  };
 
-  const renderItem = ({ item, index }) => (
-    <View style={styles.container}>
-      <Video
-        ref={(ref) => {
-          videoRefs.current[index] = ref;
-          console.log(`Video ref set for index ${index}`); // Log when ref is set
-        }}
-        source={{ uri: item.reelUrl }}
-        style={styles.video}
-        useNativeControls={false}
-        resizeMode="cover"
-        isLooping
-        shouldPlay={index === currentIndex}
-      />
-    </View>
-  );
-
-  return (
-    <FlatList
-      data={data}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={renderItem}
-      pagingEnabled
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.contentContainerStyle}
-      onViewableItemsChanged={handleViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
-    />
-  );
-};
-
-export default Reels;
-
-const styles = StyleSheet.create({
-  container: {
-    width: Dimensions.get("window").width,
-    height: screenHeight,
-    backgroundColor: "black",
-  },
-  video: {
-    width: "100%",
-    height: "100%",
-  },
-  contentContainerStyle: {
-    alignItems: "center",
-  },
-});
-
-
-
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  TouchableOpacity,
-  ActivityIndicator,
-  View,
-  Button,
-} from "react-native";
-import React, { useState } from "react";
-import Colors from "../../constants/Colors";
-import * as ImagePicker from "expo-image-picker";
-
-const defaultImage =
-  "https://static-00.iconduck.com/assets.00/cat-symbol-icon-256x256-jqp15brc.png";
-
-const EditProfileScreen = () => {
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [image, setImage] = useState(null);
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0]);
-    }
-  };
-
-  const handleSubmit = async () => {
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", "ganesh@gmail.com");
-
-    const profileImage = {
-      uri: image.uri,
-      type: image.mimeType,
-      name: image.uri.split("/").pop(),
-    };
-    formData.append("profileImage", profileImage);
-
     try {
-      const response = await fetch("http://localhost:5000/editProfile", {
-        method: "PATCH",
-        body: formData,
+      const response = await fetch(`${BACKEND_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        console.log(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-      console.log(data); // Handle the response data as needed
+
+      if (response.ok) {
+        router.push("../(tabs)/reels");
+        Toast.show({
+          type: "success",
+          text1: "Welcome Back!",
+          text2: "Happy to see you again 👋",
+        });
+
+        dispatch(storeId(data.user._id));
+        dispatch(storeName(data.user.name));
+        dispatch(storeEmail(data.user.email));
+        dispatch(storeProfileImage(data.user.profileImage));
+        dispatch(storeReels(data.user.reels));
+
+        try {
+          await AsyncStorage.clear();
+          await AsyncStorage.setItem("id", data.user._id);
+          await AsyncStorage.setItem("name", data.user.name);
+          await AsyncStorage.setItem("email", data.user.email);
+          await AsyncStorage.setItem("profileImage", data.user.profileImage);
+          await AsyncStorage.setItem("reels", JSON.stringify(data.user.reels));
+        } catch (error) {
+          console.error("Error saving data on login", error);
+        }
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: data.message || "Invalid email or password.",
+        });
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Network Error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Network Error",
+        text2: "Please check your internet connection.",
+      });
     } finally {
       setLoading(false);
     }
   };
-
-  return (
-    <SafeAreaView style={styles.screen}>
-      <KeyboardAvoidingView style={styles.keyboardAvoidingView}>
-        {/* <TouchableOpacity
-          onPress={handleImagePicker}
-          style={styles.imageContainer}
-        >
-          <Image
-            source={{ uri: profileImage || defaultImage }}
-            style={styles.profileImage}
-          />
-        </TouchableOpacity> */}
-
-        <View style={styles.container}>
-          <Button title="Pick an image from camera roll" onPress={pickImage} />
-          {image && <Image source={{ uri: image }} style={styles.image} />}
-        </View>
-
-        <Text style={styles.headText}>Edit Profile</Text>
-        <Text style={styles.subText}>Update Your Information</Text>
-
-        <TextInput
-          placeholder="Your New Cat Name 😻"
-          placeholderTextColor={Colors.gray}
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-        />
-
-        <TouchableOpacity
-          style={styles.btnBox}
-          onPress={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={Colors.white} />
-          ) : (
-            <Text style={styles.btnText}>Save Changes</Text>
-          )}
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
-};
-
-export default EditProfileScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: 200,
-    height: 200,
-  },
-  screen: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: Colors.pink,
-    height: "100%",
-    padding: "2rem",
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  imageContainer: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    overflow: "hidden",
-    borderWidth: 2,
-    borderColor: Colors.red,
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  headText: {
-    fontSize: 50,
-    fontFamily: "Bold",
-    textAlign: "center",
-  },
-  subText: {
-    fontSize: 20,
-    fontFamily: "Regular",
-    textAlign: "center",
-    marginVertical: 10,
-    color: Colors.black,
-    marginBottom: 40,
-  },
-  input: {
-    backgroundColor: Colors.white,
-    borderColor: Colors.gray,
-    borderWidth: 1,
-    borderRadius: 10,
-    width: 300,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    fontFamily: "Regular",
-    fontSize: 18,
-    color: Colors.black,
-    textAlign: "center",
-  },
-  btnBox: {
-    marginTop: 20,
-    backgroundColor: Colors.red,
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderRadius: 10,
-    width: 300,
-    textAlign: "center",
-  },
-  btnText: {
-    fontFamily: "Bold",
-    fontSize: 25,
-    color: Colors.white,
-  },
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

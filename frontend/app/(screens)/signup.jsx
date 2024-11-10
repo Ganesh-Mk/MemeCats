@@ -8,11 +8,11 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
 import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
 import {
   storeName,
@@ -23,31 +23,28 @@ import {
 } from "../../store/user";
 import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const images = {
-  signup: require("../../assets/gif/dancingCat.gif"),
-  name: require("../../assets/gif/wishingCat.gif"),
-  email: require("../../assets/gif/sleepingCat.gif"),
-  password: require("../../assets/gif/popCat.gif"),
-};
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { Ionicons } from "@expo/vector-icons";
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const [focusedField, setFocusedField] = useState("signup");
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
   const router = useRouter();
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+
+  const toggleSecureTextEntry = () => {
+    setSecureTextEntry(!secureTextEntry);
+  };
 
   const handleSubmit = async () => {
     if (!name || !email || !password) {
-      console.log("not all fields are filled");
-      Toast.show({
-        type: "error",
-        text1: "All fields are required",
-        text2: "Please fill in all the fields",
-      });
+      setModalVisible(true);
+      setModalMessage("You dumb! Fill all the fields");
       return;
     }
 
@@ -83,36 +80,32 @@ const Signup = () => {
         }
 
         router.push("../(tabs)/reels");
-        Toast.show({
-          type: "success",
-          text1: "Welcome!",
-          text2: "Start your journey with Meow 👋",
-        });
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Signup Failed",
-          text2: data.message || "Email already exists. Please try again.",
-        });
+        setModalVisible(true);
+        setModalMessage("Email Already Exists, Try using another Email");
       }
     } catch (error) {
       console.error("Network Error:", error);
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "Please check your internet connection and try again.",
-      });
+      setModalVisible(true);
+      setModalMessage("Something went wrong, Check your internet connection!");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <KeyboardAvoidingView style={styles.keyboardAvoidingView}>
-        <View style={styles.imageContainer}>
-          <Image source={images[focusedField]} style={styles.image} />
-        </View>
+    <ScrollView>
+      <ConfirmationModal
+        visible={isModalVisible}
+        message={modalMessage}
+        button={"Oh Okay"}
+        onConfirm={() => setModalVisible(false)}
+      />
+      <View style={styles.screen}>
+        <Image
+          source={require("../../assets/gif/dancingCat.gif")}
+          style={styles.image}
+        />
 
         <Text style={styles.headText}>Meow Up</Text>
         <Text style={styles.subText}>Create New Account</Text>
@@ -121,7 +114,6 @@ const Signup = () => {
           placeholder="Your Cat Name 😻"
           placeholderTextColor={Colors.gray}
           style={styles.input}
-          onFocus={() => setFocusedField("name")}
           onChangeText={setName}
         />
 
@@ -130,18 +122,28 @@ const Signup = () => {
           placeholderTextColor={Colors.gray}
           style={styles.input}
           keyboardType="email-address"
-          onFocus={() => setFocusedField("email")}
           onChangeText={setEmail}
         />
 
-        <TextInput
-          placeholder="New Password 🙀"
-          placeholderTextColor={Colors.gray}
-          style={styles.input}
-          secureTextEntry
-          onFocus={() => setFocusedField("password")}
-          onChangeText={setPassword}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="New Password 🙀"
+            placeholderTextColor={Colors.gray}
+            style={[styles.input, { paddingRight: 50 }]}
+            secureTextEntry={secureTextEntry}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            onPress={toggleSecureTextEntry}
+            style={styles.eyeButton}
+          >
+            <Ionicons
+              name={secureTextEntry ? "eye-off" : "eye"}
+              size={24}
+              color={Colors.gray}
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={styles.btnBox}
@@ -149,13 +151,13 @@ const Signup = () => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color={Colors.white} />
+            <ActivityIndicator color={Colors.white} size="large" />
           ) : (
             <Text style={styles.btnText}>Submit Meow!</Text>
           )}
         </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -164,41 +166,35 @@ export default Signup;
 const styles = StyleSheet.create({
   screen: {
     display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: Colors.pink,
-    height: "100%",
-    padding: "2rem",
-  },
-  keyboardAvoidingView: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  imageContainer: {
-    width: 300,
-    height: 200,
-    overflow: "hidden",
-    borderRadius: 10,
-    marginBottom: 10,
+    backgroundColor: Colors.pink,
+    padding: 20,
+    paddingTop: 210,
   },
   image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    width: 250,
+    height: 320,
+    marginBottom: 40,
+    resizeMode: "contain",
+    position: "absolute",
+    top: -120,
   },
   headText: {
     fontSize: 50,
     fontFamily: "Bold",
     textAlign: "center",
+    color: Colors.darkBlue,
   },
   subText: {
     fontSize: 20,
     fontFamily: "Regular",
     textAlign: "center",
-    marginVertical: 10,
     color: Colors.black,
     marginBottom: 40,
+  },
+  inputContainer: {
+    position: "relative",
   },
   input: {
     backgroundColor: Colors.white,
@@ -210,9 +206,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 20,
     fontFamily: "Regular",
-    fontSize: 18,
+    fontSize: 20,
     color: Colors.black,
     textAlign: "center",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 20,
+    top: 25,
+    opacity: 0.4,
+    transform: [{ translateY: -12 }],
   },
   btnBox: {
     marginTop: 20,

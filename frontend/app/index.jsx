@@ -18,18 +18,21 @@ import { Audio } from "expo-av";
 const Entrance = () => {
   const dispatch = useDispatch();
   const [sound, setSound] = useState(null);
+
+  const stopSound = async () => {
+    if (sound) {
+      await sound.stopAsync();
+      setSound(null);
+    }
+  };
+
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/audio/happy-happy-cat.mp3"),
       { shouldPlay: true, isLooping: true }
     );
+    setSound(sound);
     await sound.playAsync();
-  };
-  const stopSound = async () => {
-    if (sound) {
-      await sound.stopAsync(); // Stop the sound
-      setSound(null); // Clear the sound state
-    }
   };
 
   async function autoLogin() {
@@ -38,6 +41,7 @@ const Entrance = () => {
       console.log("Logout user / new User");
       playSound();
     } else {
+      stopSound();
       setTimeout(() => router.push("./(tabs)/account"), 0);
       dispatch(storeId(await AsyncStorage.getItem("id")));
       dispatch(storeName(await AsyncStorage.getItem("name")));
@@ -64,15 +68,15 @@ const Entrance = () => {
         Get ready for a pawsome ride through the funniest, sassiest cat memes
         ever
       </Text>
-      {/* <Link href="" style={styles.btnBox}>
-        <Text style={styles.btnText}>Let's Get Started 😻</Text>
-      </Link> */}
 
       <CatButton
         text="Let's Get Started 😻"
         fontFamily={"Bold"}
         fontSize={25}
-        onPress={() => router.push("./(screens)/loginOrSingup")}
+        onPress={() => {
+          stopSound();
+          router.push("./(screens)/loginOrSingup");
+        }}
       />
     </View>
   );
@@ -121,6 +125,7 @@ const styles = StyleSheet.create({
     fontFamily: "Regular",
     textAlign: "center",
     marginVertical: 20,
+    marginBottom: 50,
     color: Colors.black,
   },
   image: {

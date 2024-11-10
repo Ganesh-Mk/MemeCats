@@ -6,14 +6,13 @@ import {
   View,
   SafeAreaView,
   KeyboardAvoidingView,
-  Platform,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "../../constants/Colors";
-import { router } from "expo-router";
-import Toast from "react-native-toast-message";
+import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import {
   storeName,
@@ -21,33 +20,31 @@ import {
   storeProfileImage,
   storeReels,
   storeId,
-} from "../../store/user.js";
+} from "../../store/user";
 import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import CatButton from "../../components/CatButton";
-
-const images = {
-  login: require("../../assets/gif/kissCat.gif"),
-  email: require("../../assets/gif/sleepingCat.gif"),
-  password: require("../../assets/gif/popCat.gif"),
-};
+import ConfirmationModal from "../../components/ConfirmationModal";
+import { Ionicons } from "@expo/vector-icons";
 
 const Login = () => {
   const dispatch = useDispatch();
-  const [focusedField, setFocusedField] = useState("login");
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const router = useRouter();
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+
+  const toggleSecureTextEntry = () => {
+    setSecureTextEntry(!secureTextEntry);
+  };
 
   const handleSubmit = async () => {
-    // router.push("../(tabs)/reels");
-
     if (!email || !password) {
-      Toast.show({
-        type: "error",
-        text1: "All fields are required",
-        text2: "Please fill in all the fields",
-      });
+      setModalVisible(true);
+      setModalMessage("You dumb! Fill all the fields");
       return;
     }
 
@@ -65,12 +62,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("../(tabs)/reels");
-        Toast.show({
-          type: "success",
-          text1: "Welcome Back!",
-          text2: "Happy to see you again 👋",
-        });
+        router.push("../(tabs)/account");
 
         dispatch(storeId(data.user._id));
         dispatch(storeName(data.user.name));
@@ -89,70 +81,76 @@ const Login = () => {
           console.error("Error saving data on login", error);
         }
       } else {
-        Toast.show({
-          type: "error",
-          text1: "Login Failed",
-          text2: data.message || "Invalid email or password.",
-        });
+        setModalVisible(true);
+        setModalMessage("Email or password is wrong hooman! ");
       }
     } catch (error) {
       console.error("Network Error:", error);
-      Toast.show({
-        type: "error",
-        text1: "Network Error",
-        text2: "Please check your internet connection.",
-      });
+      setModalVisible(true);
+      setModalMessage("Something went wrong, Check your internet connection!");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
-      >
-        <View style={styles.imageContainer}>
-          <Image source={images[focusedField]} style={styles.image} />
-        </View>
+    <ScrollView>
+      <ConfirmationModal
+        visible={isModalVisible}
+        message={modalMessage}
+        button={"Oh Okay"}
+        onConfirm={() => setModalVisible(false)}
+      />
+      <View style={styles.screen}>
+        <Image
+          source={require("../../assets/gif/dancingCat.gif")}
+          style={styles.image}
+        />
 
         <Text style={styles.headText}>Meow In</Text>
-        <Text style={styles.subText}>Login To Your Account</Text>
+        <Text style={styles.subText}>Log in to your account</Text>
 
         <TextInput
           placeholder="Your Email 🐱"
           placeholderTextColor={Colors.gray}
           style={styles.input}
           keyboardType="email-address"
-          onFocus={() => setFocusedField("email")}
           onChangeText={setEmail}
         />
 
-        <TextInput
-          placeholder="Your Password 🙀"
-          placeholderTextColor={Colors.gray}
-          style={styles.input}
-          secureTextEntry
-          onFocus={() => setFocusedField("password")}
-          onChangeText={setPassword}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="New Password 🙀"
+            placeholderTextColor={Colors.gray}
+            style={[styles.input, { paddingRight: 50 }]}
+            secureTextEntry={secureTextEntry}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            onPress={toggleSecureTextEntry}
+            style={styles.eyeButton}
+          >
+            <Ionicons
+              name={secureTextEntry ? "eye-off" : "eye"}
+              size={24}
+              color={Colors.gray}
+            />
+          </TouchableOpacity>
+        </View>
 
-        {/* <TouchableOpacity style={styles.btnBox} onPress={handleSubmit}>
+        <TouchableOpacity
+          style={styles.btnBox}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
           {loading ? (
-            <ActivityIndicator color={Colors.white} />
+            <ActivityIndicator color={Colors.white} size="large" />
           ) : (
             <Text style={styles.btnText}>Submit Meow!</Text>
           )}
-        </TouchableOpacity> */}
-
-        <CatButton
-          text="Submit Meow!"
-          onPress={handleSubmit}
-          loading={loading}
-        />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -161,42 +159,35 @@ export default Login;
 const styles = StyleSheet.create({
   screen: {
     display: "flex",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     alignItems: "center",
     backgroundColor: Colors.pink,
-    height: "100%",
-    padding: "2rem",
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    marginTop: 50,
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-  imageContainer: {
-    width: 300,
-    height: 200,
-    overflow: "hidden",
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: 20,
+    paddingTop: 210,
   },
   image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+    width: 250,
+    height: 320,
+    marginBottom: 40,
+    resizeMode: "contain",
+    position: "absolute",
+    top: -120,
   },
   headText: {
     fontSize: 50,
     fontFamily: "Bold",
     textAlign: "center",
+    color: Colors.darkBlue,
   },
   subText: {
     fontSize: 20,
     fontFamily: "Regular",
     textAlign: "center",
-    marginVertical: 10,
     color: Colors.black,
     marginBottom: 40,
+  },
+  inputContainer: {
+    position: "relative",
   },
   input: {
     backgroundColor: Colors.white,
@@ -208,8 +199,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 20,
     fontFamily: "Regular",
-    fontSize: 18,
+    fontSize: 20,
     color: Colors.black,
     textAlign: "center",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 20,
+    top: 25,
+    opacity: 0.4,
+    transform: [{ translateY: -12 }],
+  },
+  btnBox: {
+    marginTop: 20,
+    backgroundColor: Colors.red,
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderRadius: 10,
+    width: 300,
+  },
+  btnText: {
+    fontFamily: "Bold",
+    fontSize: 25,
+    textAlign: "center",
+    color: Colors.white,
   },
 });
