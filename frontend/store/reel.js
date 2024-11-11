@@ -10,7 +10,6 @@ export const reelSlice = createSlice({
   reducers: {
     setRefreshTogglePlayPause: (state, action) => {
       state.refreshTogglePlayPause = action.payload;
-      console.log("In reelReducer: ", state.refreshTogglePlayPause);
     },
   },
 });

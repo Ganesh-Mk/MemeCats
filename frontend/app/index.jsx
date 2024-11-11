@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -18,6 +19,7 @@ import {
   storeReels,
   storeRefreshUser,
 } from "../store/user.js";
+import { setRefreshTogglePlayPause } from "../store/reel";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CatButton from "../components/CatButton";
 import { Audio } from "expo-av";
@@ -25,6 +27,7 @@ import { Audio } from "expo-av";
 const Entrance = () => {
   const dispatch = useDispatch();
   const [sound, setSound] = useState(null);
+  const [loader, setLoader] = useState(false);
 
   const stopSound = async () => {
     if (sound) {
@@ -43,9 +46,11 @@ const Entrance = () => {
   };
 
   async function autoLogin() {
+    setLoader(true);
     const name = await AsyncStorage.getItem("name");
     if (name === "" || name === null || name === undefined) {
       console.log("Logout user or new User");
+      dispatch(setRefreshTogglePlayPause(false));
       playSound();
     } else {
       stopSound();
@@ -57,6 +62,7 @@ const Entrance = () => {
       dispatch(storeReels(await AsyncStorage.getItem("reels")));
       dispatch(storeRefreshUser(0));
     }
+    setLoader(false);
   }
 
   useEffect(() => {
@@ -65,26 +71,32 @@ const Entrance = () => {
 
   return (
     <View style={styles.loginScreen}>
-      <Image
-        source={require("../assets/gif/happyCat.gif")}
-        style={styles.image}
-      />
+      {loader ? (
+        <ActivityIndicator size="large" color={Colors.red} />
+      ) : (
+        <>
+          <Image
+            source={require("../assets/gif/happyCat.gif")}
+            style={styles.image}
+          />
 
-      <Text style={styles.welcomeText}>Welcome, Hooman!</Text>
-      <Text style={styles.subText}>
-        Get ready for a pawsome ride through the funniest, sassiest cat memes
-        ever
-      </Text>
+          <Text style={styles.welcomeText}>Welcome, Hooman!</Text>
+          <Text style={styles.subText}>
+            Get ready for a pawsome ride through the funniest, sassiest cat
+            memes ever
+          </Text>
 
-      <CatButton
-        text="Let's Get Started 😻"
-        fontFamily={"Bold"}
-        fontSize={25}
-        onPress={() => {
-          stopSound();
-          router.push("./(screens)/loginOrSingup");
-        }}
-      />
+          <CatButton
+            text="Let's Get Started 😻"
+            fontFamily={"Bold"}
+            fontSize={25}
+            onPress={() => {
+              stopSound();
+              router.push("./(screens)/loginOrSingup");
+            }}
+          />
+        </>
+      )}
     </View>
   );
 };

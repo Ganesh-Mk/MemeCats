@@ -89,7 +89,6 @@ const SavedReel = ({ email }) => {
       setSavedReels((prevReels) =>
         prevReels.filter((reel) => reel._id !== reelId)
       );
-      console.log(`Reel with ID: ${reelId} deleted successfully`);
     } catch (error) {
       console.error("Error deleting reel:", error);
     }

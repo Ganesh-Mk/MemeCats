@@ -8,10 +8,16 @@ router.delete("/deleteSavedReel", async (req, res) => {
 
   try {
     const user = await User.findById(userId);
+    console.log(user.name);
 
     if (user) {
-      user.saveReels = user.saveReels.filter((id) => id.toString() !== reelId);
-      await user.save();
+      // Using $pull to remove reelId from saveReels array
+      await User.findByIdAndUpdate(
+        userId,
+        { $pull: { saveReels: reelId } }, // Pull out the reelId from saveReels array
+        { new: true } // Return the updated user document (optional)
+      );
+      console.log("done");
       return res.status(200).send({ message: "Reel Deleted Successfully" });
     } else {
       return res.status(404).send({ message: "User Not Found" });

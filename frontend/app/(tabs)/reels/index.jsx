@@ -112,7 +112,7 @@ const Reels = () => {
   const handleReelLiked = async (reel) => {
     reel.totalLikes += 1;
     reel.dailyLikes += 1;
-    console.log("Reel Liked : ", reel.totalLikes);
+    "Reel Liked : ", reel.totalLikes;
 
     const response = await fetch(`${BACKEND_URL}/updateReelLikes`, {
       method: "POST",
@@ -129,7 +129,6 @@ const Reels = () => {
   const handleReelLikeRemoved = async (reel) => {
     reel.totalLikes -= 1;
     reel.dailyLikes -= 1;
-    console.log("Likes removed: ", reel.totalLikes);
 
     const response = await fetch(`${BACKEND_URL}/updateReelLikes`, {
       method: "POST",

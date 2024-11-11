@@ -53,7 +53,8 @@ const styles = StyleSheet.create({
   rightOverlay: {
     position: "absolute",
     right: 10,
-    bottom: 100,
+    bottom: 130,
+    zIndex: 1,
     alignItems: "center",
   },
   iconButton: {

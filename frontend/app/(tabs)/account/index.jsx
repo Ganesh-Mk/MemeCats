@@ -8,6 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Video } from "expo-av";
@@ -37,7 +38,11 @@ export default function AccountScreen() {
   const [reelToDelete, setReelToDelete] = useState(null);
   const [buttonLoader, setButtonLoader] = useState(false);
   const [refreshReels, setRefreshReels] = useState(0);
-  const { name, email, profileImage, reels } = user;
+  const [name, setName] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+  const [reels, setReels] = useState([]);
+  const [reelsLoader, setReelsLoader] = useState(false);
+  const { email } = user;
 
   const handleDeleteReel = async () => {
     if (!reelToDelete) return;
@@ -86,6 +91,7 @@ export default function AccountScreen() {
   };
 
   const logout = async () => {
+    setButtonLoader(true);
     await AsyncStorage.clear();
     dispatch(storeId(""));
     dispatch(storeName(""));
@@ -94,11 +100,13 @@ export default function AccountScreen() {
     dispatch(storeReels([]));
     dispatch(setRefreshTogglePlayPause(false));
     setModalVisible(false);
+    setButtonLoader(false);
     router.push("../../");
   };
 
   useEffect(() => {
     const loadAllData = async () => {
+      setReelsLoader(true);
       try {
         const email = await AsyncStorage.getItem("email");
         const response = await fetch(`${BACKEND_URL}/getUser`, {
@@ -110,9 +118,17 @@ export default function AccountScreen() {
         });
 
         const data = await response.json();
+        setName(data.user.name);
+        setProfileImage(data.user.profileImage);
+        setReels(data.user.reels || []);
+        console.log(data.user.reels);
+        dispatch(storeName(data.user.name));
+        dispatch(storeProfileImage(data.user.profileImage));
         dispatch(storeReels(data.user.reels || []));
       } catch (err) {
         console.log(err);
+      } finally {
+        setReelsLoader(false);
       }
     };
     loadAllData();
@@ -179,6 +195,10 @@ export default function AccountScreen() {
         contentContainerStyle={styles.reelGrid}
         renderItem={({ item }) => (
           <View style={styles.reelWrapper}>
+            {reelsLoader && (
+              <ActivityIndicator size="large" color={Colors.darkPink} />
+            )}
+
             <TouchableOpacity style={styles.reelContainer}>
               <Video
                 source={{ uri: item.reelUrl }}

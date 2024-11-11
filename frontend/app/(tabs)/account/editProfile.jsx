@@ -24,6 +24,7 @@ const EditProfile = () => {
   const [name, setName] = useState(user.name);
   const [profileImage, setProfileImage] = useState(user.profileImage || "");
   const [loading, setLoading] = useState(false);
+  const [galleryLoader, setGalleryLoader] = useState(false);
   const dispatch = useDispatch();
 
   // Request permissions on mount
@@ -66,7 +67,7 @@ const EditProfile = () => {
 
       const data = await response.json();
       if (response.ok) {
-        dispatch(storeName(name));
+        dispatch(storeName(data.user.name));
         dispatch(storeProfileImage(data.user.profileImage));
         router.push("../account");
       } else {
@@ -82,12 +83,14 @@ const EditProfile = () => {
   };
 
   const pickImage = async () => {
+    setGalleryLoader(true);
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
+    setGalleryLoader(false);
 
     if (!result.canceled) {
       setProfileImage(result.assets[0].uri);
@@ -100,14 +103,20 @@ const EditProfile = () => {
         <Text style={styles.headerText}>Purr-fect your profile, hooman!</Text>
 
         <TouchableOpacity onPress={pickImage}>
-          <Image
-            source={
-              profileImage
-                ? { uri: profileImage }
-                : require("../../../assets/images/memeCats/noProfileImage.png")
-            }
-            style={styles.profileImage}
-          />
+          {galleryLoader ? (
+            <View style={styles.profileImage}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+          ) : (
+            <Image
+              source={
+                profileImage
+                  ? { uri: profileImage }
+                  : require("../../../assets/images/memeCats/noProfileImage.png")
+              }
+              style={styles.profileImage}
+            />
+          )}
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -139,7 +148,9 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     alignSelf: "center",
     marginBottom: 60,
-    backgroundColor: "#ccc", // Fallback color if the image doesn't load
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.lightGrey, // Fallback color if the image doesn't load
   },
   headerText: {
     fontSize: 32,

@@ -58,19 +58,13 @@ export default function CreateReel() {
   };
 
   const uploadMedia = async () => {
-    console.log("Came inside uploadMedia");
-
     if (!media || !desc || media === null) {
-      console.log("Came inside no media");
       Alert.alert("Upload Failed", "Please select media.", [{ text: "OK" }]);
       return;
     }
 
-    console.log("Came inside yes media");
-
     setIsUploading(true);
     let formData = new FormData();
-    console.log("user: ", user);
     formData.append("user", user.id); // Add title to formData
     formData.append("desc", desc); // Add description to formData
     formData.append("file", {
