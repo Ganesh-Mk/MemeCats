@@ -78,6 +78,7 @@ export default function AccountScreen() {
   };
 
   const confirmDeleteReel = (reelId) => {
+    console.log("delete id: ", reelId);
     setReelToDelete(reelId);
     setModalMessage("Are you sure you want to delete this reel?");
     setOnConfirmAction(() => handleDeleteReel); // Set confirm action to delete reel
@@ -188,6 +189,9 @@ export default function AccountScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerText}>Reels</Text>
+      {reelsLoader && (
+        <ActivityIndicator size="large" color={Colors.darkPink} />
+      )}
       <FlatList
         data={reels}
         numColumns={2}
@@ -195,10 +199,6 @@ export default function AccountScreen() {
         contentContainerStyle={styles.reelGrid}
         renderItem={({ item }) => (
           <View style={styles.reelWrapper}>
-            {reelsLoader && (
-              <ActivityIndicator size="large" color={Colors.darkPink} />
-            )}
-
             <TouchableOpacity style={styles.reelContainer}>
               <Video
                 source={{ uri: item.reelUrl }}

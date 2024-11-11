@@ -40,7 +40,7 @@ const Reels = () => {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [user.reels]);
 
   useEffect(() => {
     if (currentIndex !== null) {

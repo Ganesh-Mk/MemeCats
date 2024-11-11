@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema({
       ref: "Reel",
     },
   ],
+  likedReels: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reel",
+    },
+  ],
   reels: [
     {
       type: mongoose.Schema.Types.ObjectId,

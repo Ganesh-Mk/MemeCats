@@ -58,7 +58,7 @@ export default function CreateReel() {
   };
 
   const uploadMedia = async () => {
-    if (!media || !desc || media === null) {
+    if (!media || media === null) {
       Alert.alert("Upload Failed", "Please select media.", [{ text: "OK" }]);
       return;
     }
