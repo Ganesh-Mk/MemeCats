@@ -27,7 +27,6 @@ const bufferToStream = (buffer) => {
 };
 
 router.post("/createReel", upload.single("file"), async (req, res) => {
-  console.log("Came to backend");
   const { desc, user } = req.body; // Add user here
   const file = req.file;
 

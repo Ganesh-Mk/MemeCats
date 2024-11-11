@@ -72,7 +72,7 @@ export default function CreateReel() {
     let formData = new FormData();
     console.log("user: ", user);
     formData.append("user", user.id); // Add title to formData
-    formData.append("description", desc); // Add description to formData
+    formData.append("desc", desc); // Add description to formData
     formData.append("file", {
       uri: media.uri,
       type: media.type === "video" ? "video/mp4" : "image/jpeg",

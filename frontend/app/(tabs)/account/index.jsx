@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
+    gap: 5,
   },
   button: {
     backgroundColor: Colors.darkPink,

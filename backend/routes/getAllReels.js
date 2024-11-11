@@ -32,14 +32,13 @@ const sortReels = (reels) => {
 
 router.get("/getAllReels", async (req, res) => {
   try {
-    const users = await User.find().populate("reels");
+    const reels = await Reel.find().populate("user", "name profileImage");
 
-    if (users) {
-      let allReels = users.flatMap((user) => user.reels);
-      allReels = sortReels(allReels);
+    if (reels && reels.length > 0) {
+      const allReels = sortReels(reels);
       return res.status(200).send({ allReels });
     } else {
-      return res.status(404).send({ message: "User Not Found" });
+      return res.status(404).send({ message: "No Reels Found" });
     }
   } catch (err) {
     return res.status(500).send({ message: err.message });

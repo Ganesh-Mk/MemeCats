@@ -6,12 +6,16 @@ import {
   Pressable,
   Text,
   Alert,
+  Touchable,
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Video } from "expo-av";
 import { BACKEND_URL } from "../../../env";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { useSelector } from "react-redux";
+import BottomOverlay from "../../../components/BottomOverlay";
+import RightOverlay from "../../../components/RightOverlay";
+import CommentsOverlay from "../../../components/CommentsOverlay";
+import PlayPauseIcon from "../../../components/Icons/PlayPauseIcon";
 
 const { height: screenHeight } = Dimensions.get("window");
 const viewabilityConfig = {
@@ -21,10 +25,10 @@ const viewabilityConfig = {
 const Reels = () => {
   const reelReducer = useSelector((state) => state.reel);
   const user = useSelector((state) => state.user);
+  const videoRefs = useRef([]);
+
   const [data, setData] = useState([]);
   const [muted, setMuted] = useState(false);
-
-  const videoRefs = useRef([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [paused, setPaused] = useState(false);
 
@@ -37,6 +41,16 @@ const Reels = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (currentIndex !== null) {
+      if (reelReducer.refreshTogglePlayPause === true) {
+        togglePlay(currentIndex);
+      } else {
+        togglePause(currentIndex);
+      }
+    }
+  }, [reelReducer]);
 
   const toggleMute = useCallback(() => {
     setMuted((prevMuted) => !prevMuted);
@@ -58,25 +72,17 @@ const Reels = () => {
     const videoRef = videoRefs.current[index];
     if (videoRef) {
       videoRef.playAsync();
+      setPaused(false);
     }
   };
+
   const togglePause = (index) => {
     const videoRef = videoRefs.current[index];
     if (videoRef) {
       videoRef.pauseAsync();
+      setPaused(true);
     }
   };
-
-  useEffect(() => {
-    if (currentIndex !== null) {
-      if (reelReducer.refreshTogglePlayPause === true) {
-        togglePlay(currentIndex);
-      } else {
-        togglePause(currentIndex);
-      }
-      console.log("Inside toggle useEffect");
-    }
-  }, [reelReducer]);
 
   const handleViewableItemsChanged = useCallback(
     ({ viewableItems, changed }) => {
@@ -106,7 +112,24 @@ const Reels = () => {
   const handleReelLiked = async (reel) => {
     reel.totalLikes += 1;
     reel.dailyLikes += 1;
-    console.log("Liked: ", reel.totalLikes);
+    console.log("Reel Liked : ", reel.totalLikes);
+
+    const response = await fetch(`${BACKEND_URL}/updateReelLikes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reelId: reel._id,
+        totalLikes: reel.totalLikes,
+        dailyLikes: reel.dailyLikes,
+      }),
+    });
+  };
+  const handleReelLikeRemoved = async (reel) => {
+    reel.totalLikes -= 1;
+    reel.dailyLikes -= 1;
+    console.log("Likes removed: ", reel.totalLikes);
 
     const response = await fetch(`${BACKEND_URL}/updateReelLikes`, {
       method: "POST",
@@ -124,6 +147,7 @@ const Reels = () => {
   const handleReelComments = async (reel) => {
     console.log("Comment on : ", reel);
   };
+
   const handleReelSave = async (reelId) => {
     try {
       const response = await fetch(`${BACKEND_URL}/saveReel`, {
@@ -151,6 +175,14 @@ const Reels = () => {
     }
   };
 
+  const openCommentsModal = (item) => {
+    console.log("Open Comments Modal");
+  };
+
+  const closeCommentsModal = () => {
+    console.log("Close Comments Modal");
+  };
+
   const renderItem = ({ item, index }) => (
     <View style={styles.container}>
       <Pressable onPress={() => togglePlayPause(index)} style={styles.overlay}>
@@ -166,50 +198,31 @@ const Reels = () => {
           shouldPlay={index === currentIndex && !paused}
           isMuted={muted}
         />
-        {/* Bottom overlay items */}
-        <View style={styles.bottomOverlay}>
-          <Text style={styles.username}>@username</Text>
-          <Text style={styles.description}>Description of the video...</Text>
-        </View>
 
-        {/* Right-side overlay items */}
-        <View style={styles.rightOverlay}>
-          <Pressable style={styles.iconButton}>
-            <Icon
-              name="heart"
-              onPress={() => handleReelLiked(item)}
-              size={30}
-              color="white"
-            />
-          </Pressable>
-          <Pressable style={styles.iconButton}>
-            <Icon
-              name="comment"
-              onPress={() => handleReelComments(item)}
-              size={30}
-              color="white"
-            />
-          </Pressable>
-          <Pressable style={styles.iconButton}>
-            <Icon
-              name="save"
-              onPress={() => handleReelSave(item._id)}
-              size={30}
-              color="white"
-            />
-          </Pressable>
-          <Pressable
-            style={styles.iconButton}
-            onPress={() => toggleMute(index)}
-          >
-            <Icon
-              name={muted ? "volume-off" : "volume-up"}
-              size={30}
-              color="white"
-            />
-          </Pressable>
-        </View>
+        <PlayPauseIcon paused={paused} />
       </Pressable>
+
+      <BottomOverlay
+        profileImage={item.user.profileImage}
+        name={item.user.name}
+        desc={item.desc}
+      />
+
+      <RightOverlay
+        handleReelLiked={() => handleReelLiked(item)}
+        handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
+        handleReelSave={handleReelSave}
+        openCommentsModal={handleReelComments}
+        toggleMute={toggleMute}
+        muted={muted}
+        reel={item}
+        index={index}
+      />
+
+      <CommentsOverlay
+        onCommentPress={() => handleReelComments(item)}
+        onCommentClose={closeCommentsModal}
+      />
     </View>
   );
 
@@ -233,17 +246,17 @@ export default Reels;
 const styles = StyleSheet.create({
   container: {
     width: Dimensions.get("window").width,
-    height: screenHeight, // Ensure full screen height for each item
+    height: screenHeight,
     backgroundColor: "black",
   },
   video: {
     width: "100%",
-    height: "100%", // Make sure the video fills the container
+    height: "100%",
   },
   overlay: {
     width: "100%",
     height: "100%",
-    position: "relative", // Ensure it doesn't push content down
+    position: "relative",
   },
   contentContainerStyle: {
     padding: 0,
@@ -252,24 +265,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     left: 10,
-  },
-  username: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  description: {
-    color: "white",
-    fontSize: 16,
-    marginTop: 5,
-  },
-  rightOverlay: {
-    position: "absolute",
-    right: 10,
-    bottom: 100,
-    alignItems: "center",
-  },
-  iconButton: {
-    marginVertical: 10,
   },
 });

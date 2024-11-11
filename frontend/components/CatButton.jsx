@@ -12,7 +12,7 @@ const CatButton = ({ text, loading, fontFamily, fontSize, onPress, width }) => {
     <TouchableOpacity
       style={{
         backgroundColor: Colors.red,
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 10,
         borderRadius: 10,
         width: width || "100%",
