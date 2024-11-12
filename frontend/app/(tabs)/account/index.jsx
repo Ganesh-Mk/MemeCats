@@ -44,8 +44,8 @@ export default function AccountScreen() {
   const [reelsLoader, setReelsLoader] = useState(false);
   const { email } = user;
 
-  const handleDeleteReel = async () => {
-    if (!reelToDelete) return;
+  const handleDeleteReel = async (reelId) => {
+    if (!reelId) return;
 
     setButtonLoader(true);
     try {
@@ -54,7 +54,7 @@ export default function AccountScreen() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: user.id, reelId: reelToDelete }),
+        body: JSON.stringify({ userId: user.id, reelId: reelId }),
       });
 
       if (!response.ok) {
@@ -81,7 +81,7 @@ export default function AccountScreen() {
     console.log("delete id: ", reelId);
     setReelToDelete(reelId);
     setModalMessage("Are you sure you want to delete this reel?");
-    setOnConfirmAction(() => handleDeleteReel); // Set confirm action to delete reel
+    setOnConfirmAction(() => () => handleDeleteReel(reelId));
     setModalVisible(true);
   };
 

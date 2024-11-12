@@ -124,8 +124,8 @@ const SavedReel = ({ email }) => {
                 <Video
                   source={{ uri: item.reelUrl }}
                   style={styles.reelVideo}
-                  useNativeControls
                   resizeMode="contain"
+                  useNativeControls
                 />
                 <View style={styles.reelButtonsBox}>
                   <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>

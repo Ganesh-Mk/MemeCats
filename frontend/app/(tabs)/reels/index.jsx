@@ -40,7 +40,7 @@ const Reels = () => {
 
   useEffect(() => {
     getData();
-  }, [user.reels]);
+  }, []);
 
   useEffect(() => {
     if (currentIndex !== null) {
@@ -242,6 +242,7 @@ const Reels = () => {
 };
 
 export default Reels;
+
 const styles = StyleSheet.create({
   container: {
     width: Dimensions.get("window").width,
