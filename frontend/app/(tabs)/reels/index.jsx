@@ -121,8 +121,10 @@ const Reels = () => {
       },
       body: JSON.stringify({
         reelId: reel._id,
+        userId: user.id,
         totalLikes: reel.totalLikes,
         dailyLikes: reel.dailyLikes,
+        isLiked: true,
       }),
     });
   };
@@ -137,8 +139,10 @@ const Reels = () => {
       },
       body: JSON.stringify({
         reelId: reel._id,
+        userId: user.id,
         totalLikes: reel.totalLikes,
         dailyLikes: reel.dailyLikes,
+        isLiked: false,
       }),
     });
   };

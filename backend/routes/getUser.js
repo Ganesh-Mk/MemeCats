@@ -9,7 +9,8 @@ router.post("/getUser", async (req, res) => {
   try {
     const user = await User.findOne({ email })
       .populate("reels")
-      .populate("saveReels");
+      .populate("saveReels")
+      .populate("likedReels");
 
     if (user) {
       res.status(200).send({ message: "Sucessfully", user: user });
