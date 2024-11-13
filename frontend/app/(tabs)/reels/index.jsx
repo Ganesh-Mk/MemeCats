@@ -211,7 +211,7 @@ const Reels = () => {
       </Pressable>
 
       <BottomOverlay
-        profileImage={item.user.profileImage}
+        profileImage={item.user.profileImage || null}
         name={item.user.name}
         desc={item.desc}
       />

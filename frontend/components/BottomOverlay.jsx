@@ -5,7 +5,12 @@ const BottomOverlay = ({ profileImage, name, desc }) => {
   return (
     <View style={styles.bottomOverlay}>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: profileImage }} style={styles.profileImage} />
+        <Image
+          source={{
+            uri: profileImage || "../assets/images/memeCats/noProfileImage.png",
+          }}
+          style={styles.profileImage}
+        />
         <Text style={styles.username}>{name}</Text>
       </View>
       <ScrollView style={styles.descContainer} nestedScrollEnabled>
