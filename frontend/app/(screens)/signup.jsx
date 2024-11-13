@@ -129,7 +129,7 @@ const Signup = () => {
           <TextInput
             placeholder="New Password 🙀"
             placeholderTextColor={Colors.gray}
-            style={[styles.input, { paddingRight: 50 }]}
+            style={styles.input}
             secureTextEntry={secureTextEntry}
             onChangeText={setPassword}
           />

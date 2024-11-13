@@ -11,6 +11,7 @@ router.post("/saveReel", async (req, res) => {
 
     if (user) {
       user.saveReels.push(reelId);
+      console.log(user.saveReels);
       await user.save();
       return res.status(200).send({ message: "Reel Saved Successfully" });
     } else {

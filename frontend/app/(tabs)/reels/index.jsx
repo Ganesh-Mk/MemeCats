@@ -7,6 +7,7 @@ import {
   Text,
   Alert,
   Touchable,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Video } from "expo-av";
@@ -31,6 +32,7 @@ const Reels = () => {
   const [muted, setMuted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [paused, setPaused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   async function getData() {
     const response = await fetch(`${BACKEND_URL}/getAllReels`);
@@ -41,6 +43,12 @@ const Reels = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getData();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     if (currentIndex !== null) {
@@ -164,11 +172,7 @@ const Reels = () => {
         }),
       });
 
-      if (response.ok) {
-        Alert.alert("Reel Saved Successfully", " Your reel has been saved", [
-          { text: "OK" },
-        ]);
-      } else {
+      if (!response.ok) {
         Alert.alert("Reel Not Saved", " Your reel has not been saved", [
           { text: "OK" },
         ]);
@@ -214,7 +218,7 @@ const Reels = () => {
       <RightOverlay
         handleReelLiked={() => handleReelLiked(item)}
         handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
-        handleReelSave={handleReelSave}
+        handleReelSave={() => handleReelSave(item._id)}
         openCommentsModal={handleReelComments}
         toggleMute={toggleMute}
         muted={muted}
@@ -241,6 +245,8 @@ const Reels = () => {
       onViewableItemsChanged={handleViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       contentContainerStyle={styles.contentContainerStyle}
+      refreshing={refreshing} // Add this
+      onRefresh={onRefresh}
     />
   );
 };

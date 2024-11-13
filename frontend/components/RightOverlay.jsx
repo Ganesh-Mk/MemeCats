@@ -2,11 +2,14 @@ import React from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import LikeIcon from "./Icons/LikeIcon";
+import SaveIcon from "./Icons/SaveIcon";
+import SoundIcon from "./Icons/SoundIcon";
 
 const RightOverlay = ({
   handleReelLiked,
   handleReelLikeRemoved,
   handleReelSave,
+
   openCommentsModal,
   toggleMute,
   muted,
@@ -22,28 +25,24 @@ const RightOverlay = ({
           handleReelLikeRemoved={handleReelLikeRemoved}
         />
       </Pressable>
-      <Pressable style={styles.iconButton}>
+      {/* <Pressable style={styles.iconButton}>
         <Icon
           name="comment"
           onPress={() => openCommentsModal(reel)}
           size={30}
           color="white"
         />
-      </Pressable>
+      </Pressable> */}
       <Pressable style={styles.iconButton}>
-        <Icon
-          name="save"
-          onPress={() => handleReelSave(reel._id)}
-          size={30}
-          color="white"
-        />
+        <SaveIcon reel={reel} handleReelSaved={handleReelSave} />
       </Pressable>
       <Pressable style={styles.iconButton} onPress={() => toggleMute(index)}>
-        <Icon
+        {/* <Icon
           name={muted ? "volume-off" : "volume-up"}
           size={30}
           color="white"
-        />
+        /> */}
+        <SoundIcon muted={muted} />
       </Pressable>
     </View>
   );
