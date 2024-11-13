@@ -27,6 +27,7 @@ const getUserRouter = require("./routes/getUser");
 const updateReelLikesRouter = require("./routes/updateReelLikes");
 const saveReelRouter = require("./routes/saveReel");
 const deleteSavedReelRouter = require("./routes/deleteSavedReel");
+const getRankingRouter = require("./routes/getRanking");
 
 app.use(signupRouter);
 app.use(loginRouter);
@@ -40,6 +41,7 @@ app.use(getUserRouter);
 app.use(updateReelLikesRouter);
 app.use(saveReelRouter);
 app.use(deleteSavedReelRouter);
+app.use(getRankingRouter);
 
 const User = require("./models/userModel");
 
@@ -60,6 +62,7 @@ app.get("/getAllReels", getAllReelsRouter);
 app.get("/getReel", getReelRouter);
 app.get("/delete", deleteRouter);
 app.get("/getUser", getUserRouter);
+app.get("/getRanking", getRankingRouter);
 
 app.post("/signup", signupRouter);
 app.post("/login", loginRouter);

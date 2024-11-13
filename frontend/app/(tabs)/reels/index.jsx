@@ -45,6 +45,7 @@ const Reels = () => {
   }, []);
 
   const onRefresh = async () => {
+    console.log("ONRefresh called");
     setRefreshing(true);
     await getData();
     setRefreshing(false);

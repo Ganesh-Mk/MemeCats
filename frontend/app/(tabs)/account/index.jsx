@@ -93,13 +93,13 @@ export default function AccountScreen() {
 
   const logout = async () => {
     setButtonLoader(true);
+    dispatch(setRefreshTogglePlayPause(false));
     await AsyncStorage.clear();
     dispatch(storeId(""));
     dispatch(storeName(""));
     dispatch(storeEmail(""));
     dispatch(storeProfileImage(""));
     dispatch(storeReels([]));
-    dispatch(setRefreshTogglePlayPause(false));
     setModalVisible(false);
     setButtonLoader(false);
     router.push("../../");
@@ -181,16 +181,18 @@ export default function AccountScreen() {
           style={styles.btnBox}
         >
           <Image
-            style={{ width: 25, height: "100%" }}
-            source={{
-              uri: "https://cdn.iconscout.com/icon/free/png-256/free-save-logo-icon-download-in-svg-png-gif-file-formats--instagram-social-media-brand-filled-line-pack-logos-icons-2724646.png?f=webp&w=256",
-            }}
+            style={{ width: 20, height: "100%" }}
+            source={require("../../../assets/images/save-instagram (2).png")}
           />
         </TouchableOpacity>
       </View>
       <Text style={styles.headerText}>Reels</Text>
       {reelsLoader && (
-        <ActivityIndicator size="large" color={Colors.darkPink} />
+        <ActivityIndicator
+          style={{ marginTop: 50 }}
+          size="large"
+          color={Colors.darkPink}
+        />
       )}
       <FlatList
         data={reels}

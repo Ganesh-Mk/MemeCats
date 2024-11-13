@@ -37,11 +37,6 @@ const RightOverlay = ({
         <SaveIcon reel={reel} handleReelSaved={handleReelSave} />
       </Pressable>
       <Pressable style={styles.iconButton} onPress={() => toggleMute(index)}>
-        {/* <Icon
-          name={muted ? "volume-off" : "volume-up"}
-          size={30}
-          color="white"
-        /> */}
         <SoundIcon muted={muted} />
       </Pressable>
     </View>
