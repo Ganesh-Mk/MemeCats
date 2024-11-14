@@ -47,7 +47,12 @@ export default function VideoModal({
                 />
                 <Text style={styles.name}>{name}</Text>
               </View>
-              <CatButton text="X" width={50} onPress={onClose} />
+              <CatButton
+                fontFamily="Bold"
+                text="X"
+                width={50}
+                onPress={onClose}
+              />
             </View>
 
             {/* Video Section */}
@@ -67,7 +72,9 @@ export default function VideoModal({
             </View>
 
             {/* Description */}
-            <Text style={styles.description}>{description}</Text>
+            <ScrollView style={styles.descriptionContainer}>
+              <Text style={styles.description}>{description}</Text>
+            </ScrollView>
           </View>
         </View>
       </ScrollView>
@@ -89,6 +96,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: "90%",
     maxWidth: 400,
+    height: "95%",
     alignItems: "center",
   },
   header: {
@@ -112,7 +120,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: Colors.darkText,
-    marginLeft: 15,
+    marginLeft: 5,
+    width: 130,
+    flexWrap: "wrap",
   },
   video: {
     width: "100%",
@@ -131,8 +141,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.darkPink,
   },
+  descriptionContainer: {
+    width: "100%",
+    marginBottom: 5,
+    height: 200,
+    textAlign: "center",
+  },
   description: {
     fontSize: 18,
+
     fontFamily: "Regular",
     color: Colors.darkText,
     marginBottom: 15,

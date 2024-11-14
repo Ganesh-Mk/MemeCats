@@ -58,12 +58,10 @@ router.patch(
           bufferToStream(profileImageFile.buffer).pipe(uploadStream);
         });
 
-        console.log("After Cloudinary upload", result);
         user.profileImage = result.secure_url; // Store the Cloudinary URL in MongoDB
       }
 
       await user.save();
-      console.log("After user save");
 
       res.status(200).send({ message: "Edited Successfully", user });
     } catch (err) {

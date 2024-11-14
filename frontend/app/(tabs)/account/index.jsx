@@ -27,6 +27,7 @@ import Colors from "../../../constants/Colors";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import { setRefreshTogglePlayPause } from "../../../store/reel";
 import CatButton from "../../../components/CatButton";
+import VideoModal from "../../../components/VideoModel";
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -42,6 +43,9 @@ export default function AccountScreen() {
   const [profileImage, setProfileImage] = useState("");
   const [reels, setReels] = useState([]);
   const [reelsLoader, setReelsLoader] = useState(false);
+  const [videoModalVisible, setVideoModalVisible] = useState(false);
+  const [selectedReel, setSelectedReel] = useState(null); // Store selected user details
+
   const { email } = user;
 
   const handleDeleteReel = async (reelId) => {
@@ -62,7 +66,6 @@ export default function AccountScreen() {
         Alert.alert("Error during Reel deletion", errorData.message, [
           { text: "OK" },
         ]);
-        console.log("Error deleting reel:", errorData.message);
         return;
       }
 
@@ -77,8 +80,16 @@ export default function AccountScreen() {
     }
   };
 
+  const openModal = (reel) => {
+    setSelectedReel(reel);
+    setVideoModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setVideoModalVisible(false);
+  };
+
   const confirmDeleteReel = (reelId) => {
-    console.log("delete id: ", reelId);
     setReelToDelete(reelId);
     setModalMessage("Are you sure you want to delete this reel?");
     setOnConfirmAction(() => () => handleDeleteReel(reelId));
@@ -105,38 +116,54 @@ export default function AccountScreen() {
     router.push("../../");
   };
 
-  useEffect(() => {
-    const loadAllData = async () => {
-      setReelsLoader(true);
-      try {
-        const email = await AsyncStorage.getItem("email");
-        const response = await fetch(`${BACKEND_URL}/getUser`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        });
+  const loadAllData = async () => {
+    setReelsLoader(true);
+    try {
+      const email = await AsyncStorage.getItem("email");
+      const response = await fetch(`${BACKEND_URL}/getUser`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-        const data = await response.json();
-        setName(data.user.name);
-        setProfileImage(data.user.profileImage);
-        setReels(data.user.reels || []);
-        console.log(data.user.reels);
-        dispatch(storeName(data.user.name));
-        dispatch(storeProfileImage(data.user.profileImage));
-        dispatch(storeReels(data.user.reels || []));
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setReelsLoader(false);
-      }
-    };
+      const data = await response.json();
+      setName(data.user.name);
+      setProfileImage(data.user.profileImage);
+      setReels(data.user.reels || []);
+      dispatch(storeName(data.user.name));
+      dispatch(storeProfileImage(data.user.profileImage));
+      dispatch(storeReels(data.user.reels || []));
+    } catch (err) {
+      Alert.alert(
+        "Error",
+        "Unable to fetch user data! Check your internet connection",
+        [{ text: "OK" }]
+      );
+    } finally {
+      setReelsLoader(false);
+    }
+  };
+
+  useEffect(() => {
     loadAllData();
   }, [refreshReels]);
 
   return (
     <View style={styles.container}>
+      {selectedReel && (
+        <VideoModal
+          visible={videoModalVisible}
+          onClose={closeModal}
+          videoUrl={selectedReel.reelUrl}
+          profileImage={profileImage}
+          name={name}
+          dailyLikes={selectedReel.dailyLikes}
+          totalLikes={selectedReel.totalLikes}
+          description={selectedReel.desc}
+        />
+      )}
       <ConfirmationModal
         visible={isModalVisible}
         loader={buttonLoader}
@@ -187,25 +214,22 @@ export default function AccountScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerText}>Reels</Text>
-      {reelsLoader && (
-        <ActivityIndicator
-          style={{ marginTop: 50 }}
-          size="large"
-          color={Colors.darkPink}
-        />
-      )}
       <FlatList
         data={reels}
         numColumns={2}
         keyExtractor={(item, index) => `Account-reel-${index}`}
         contentContainerStyle={styles.reelGrid}
+        refreshing={reelsLoader}
+        onRefresh={() => loadAllData()}
         renderItem={({ item }) => (
           <View style={styles.reelWrapper}>
-            <TouchableOpacity style={styles.reelContainer}>
+            <TouchableOpacity
+              style={styles.reelContainer}
+              onPress={() => openModal(item)}
+            >
               <Video
                 source={{ uri: item.reelUrl }}
                 style={styles.reelVideo}
-                useNativeControls
                 resizeMode="contain"
               />
               <View style={styles.reelButtonsBox}>

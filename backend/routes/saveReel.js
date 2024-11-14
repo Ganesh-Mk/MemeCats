@@ -4,14 +4,12 @@ const User = require("../models/userModel");
 
 router.post("/saveReel", async (req, res) => {
   const { reelId, userId } = req.body;
-  console.log("ReelId: ", reelId, " UserId: ", userId);
 
   try {
     const user = await User.findById(userId);
 
     if (user) {
       user.saveReels.push(reelId);
-      console.log(user.saveReels);
       await user.save();
       return res.status(200).send({ message: "Reel Saved Successfully" });
     } else {

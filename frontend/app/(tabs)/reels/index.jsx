@@ -17,6 +17,7 @@ import BottomOverlay from "../../../components/BottomOverlay";
 import RightOverlay from "../../../components/RightOverlay";
 import CommentsOverlay from "../../../components/CommentsOverlay";
 import PlayPauseIcon from "../../../components/Icons/PlayPauseIcon";
+import Colors from "../../../constants/Colors";
 
 const { height: screenHeight } = Dimensions.get("window");
 const viewabilityConfig = {
@@ -33,11 +34,14 @@ const Reels = () => {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [paused, setPaused] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [reelsLoader, setReelsLoader] = useState(false);
 
   async function getData() {
+    setReelsLoader(true);
     const response = await fetch(`${BACKEND_URL}/getAllReels`);
     const data = await response.json();
     setData(data.allReels);
+    setReelsLoader(false);
   }
 
   useEffect(() => {
@@ -45,7 +49,6 @@ const Reels = () => {
   }, []);
 
   const onRefresh = async () => {
-    console.log("ONRefresh called");
     setRefreshing(true);
     await getData();
     setRefreshing(false);
@@ -156,9 +159,7 @@ const Reels = () => {
     });
   };
 
-  const handleReelComments = async (reel) => {
-    console.log("Comment on : ", reel);
-  };
+  const handleReelComments = async (reel) => {};
 
   const handleReelSave = async (reelId) => {
     try {
@@ -179,58 +180,69 @@ const Reels = () => {
         ]);
       }
     } catch (err) {
-      console.log(err);
+      Alert.alert("An error occurred", "Unable to save the reel.", [
+        { text: "OK" },
+      ]);
     }
   };
 
-  const openCommentsModal = (item) => {
-    console.log("Open Comments Modal");
-  };
+  const openCommentsModal = (item) => {};
 
-  const closeCommentsModal = () => {
-    console.log("Close Comments Modal");
-  };
+  const closeCommentsModal = () => {};
 
   const renderItem = ({ item, index }) => (
     <View style={styles.container}>
-      <Pressable onPress={() => togglePlayPause(index)} style={styles.overlay}>
-        <Video
-          ref={(ref) => {
-            videoRefs.current[index] = ref;
-          }}
-          source={{ uri: item.reelUrl }}
-          style={styles.video}
-          useNativeControls={false}
-          resizeMode="cover"
-          isLooping
-          shouldPlay={index === currentIndex && !paused}
-          isMuted={muted}
+      {reelsLoader ? (
+        <ActivityIndicator
+          size="large"
+          color={Colors.red}
+          style={styles.activityIndicator}
         />
+      ) : (
+        <View>
+          <Pressable
+            onPress={() => togglePlayPause(index)}
+            style={styles.overlay}
+          >
+            <Video
+              ref={(ref) => {
+                videoRefs.current[index] = ref;
+              }}
+              source={{ uri: item.reelUrl }}
+              style={styles.video}
+              useNativeControls={false}
+              resizeMode="cover"
+              isLooping
+              shouldPlay={index === currentIndex && !paused}
+              isMuted={muted}
+            />
 
-        <PlayPauseIcon paused={paused} />
-      </Pressable>
+            <PlayPauseIcon paused={paused} />
+          </Pressable>
 
-      <BottomOverlay
-        profileImage={item.user.profileImage || null}
-        name={item.user.name}
-        desc={item.desc}
-      />
+          <BottomOverlay
+            profileImage={item.user.profileImage || null}
+            name={item.user.name}
+            desc={item.desc}
+          />
 
-      <RightOverlay
-        handleReelLiked={() => handleReelLiked(item)}
-        handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
-        handleReelSave={() => handleReelSave(item._id)}
-        openCommentsModal={handleReelComments}
-        toggleMute={toggleMute}
-        muted={muted}
-        reel={item}
-        index={index}
-      />
+          <RightOverlay
+            handleReelLiked={() => handleReelLiked(item)}
+            handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
+            handleReelSave={() => handleReelSave(item._id)}
+            openCommentsModal={handleReelComments}
+            toggleMute={toggleMute}
+            muted={muted}
+            reel={item}
+            index={index}
+          />
 
-      <CommentsOverlay
-        onCommentPress={() => handleReelComments(item)}
-        onCommentClose={closeCommentsModal}
-      />
+          <CommentsOverlay
+            onCommentPress={() => handleReelComments(item)}
+            onCommentClose={closeCommentsModal}
+          />
+        </View>
+      )}
     </View>
   );
 
@@ -263,6 +275,9 @@ const styles = StyleSheet.create({
   video: {
     width: "100%",
     height: "100%",
+  },
+  activityIndicator: {
+    marginTop: 350,
   },
   overlay: {
     width: "100%",

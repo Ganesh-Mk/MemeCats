@@ -60,7 +60,6 @@ const Signup = () => {
       });
 
       const data = await response.json();
-      console.log("data.id: ", data.id);
 
       if (response.ok) {
         dispatch(storeId(data.id));

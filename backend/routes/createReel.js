@@ -30,8 +30,6 @@ router.post("/createReel", upload.single("file"), async (req, res) => {
   const { desc, user } = req.body; // Add user here
   const file = req.file;
 
-  console.log("req.body: ", req.body);
-
   try {
     if (!user) {
       return res.status(400).send({ message: "User is required" });

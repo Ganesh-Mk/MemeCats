@@ -5,12 +5,17 @@ const User = require("../models/userModel");
 router.post("/getUser", async (req, res) => {
   const { email } = req.body;
 
-  console.log("Email: ", email);
   try {
     const user = await User.findOne({ email })
-      .populate("reels")
-      .populate("saveReels")
-      .populate("likedReels");
+      .populate({
+        path: "saveReels",
+        populate: {
+          path: "user",
+          select: "name profileImage",
+        },
+      })
+      .populate("likedReels")
+      .populate("reels");
 
     if (user) {
       res.status(200).send({ message: "Sucessfully", user: user });

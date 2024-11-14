@@ -15,47 +15,58 @@ import Colors from "../../../constants/Colors";
 import { BACKEND_URL } from "../../../env";
 import { useSelector } from "react-redux";
 import ConfirmationModal from "../../../components/ConfirmationModal";
+import VideoModal from "../../../components/VideoModel";
 
 const SavedReel = ({ email }) => {
   const [savedReels, setSavedReels] = useState([]);
   const [loader, setLoader] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [videoModalVisible, setVideoModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [buttonLoader, setButtonLoader] = useState(false);
   const [reelIdToDelete, setReelIdToDelete] = useState(null);
+  const [selectedReel, setSelectedReel] = useState(null); // Store selected user details
+
   const user = useSelector((state) => state.user);
+  const fetchUser = async () => {
+    setLoader(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/getUser`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+      });
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setLoader(true);
-      try {
-        const response = await fetch(`${BACKEND_URL}/getUser`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: user.email }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-
-        if (data.user) {
-          setSavedReels(data.user.saveReels);
-          setLoader(false);
-        } else {
-          console.error("User not found");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    };
 
+      const data = await response.json();
+
+      if (data.user) {
+        setSavedReels(data.user.saveReels);
+        setLoader(false);
+      } else {
+        console.error("User not found");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+  useEffect(() => {
     fetchUser();
   }, [email, user.email]);
+
+  const openModal = (reel) => {
+    setSelectedReel(reel);
+    setVideoModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setVideoModalVisible(false);
+  };
 
   const confirmDeleteReel = (reelId) => {
     setReelIdToDelete(reelId);
@@ -96,6 +107,18 @@ const SavedReel = ({ email }) => {
 
   return (
     <View style={styles.container}>
+      {selectedReel && (
+        <VideoModal
+          visible={videoModalVisible}
+          onClose={closeModal}
+          videoUrl={selectedReel.reelUrl}
+          profileImage={selectedReel.user.profileImage}
+          name={selectedReel.user.name}
+          dailyLikes={selectedReel.dailyLikes}
+          totalLikes={selectedReel.totalLikes}
+          description={selectedReel.desc}
+        />
+      )}
       <Text style={styles.headerText}>Meow-ments You've Saved</Text>
       {loader ? (
         <ActivityIndicator
@@ -118,14 +141,18 @@ const SavedReel = ({ email }) => {
           numColumns={2}
           keyExtractor={(item, index) => `SavedReel-${index}`}
           contentContainerStyle={styles.reelGrid}
+          refreshing={loader}
+          onRefresh={() => fetchUser()}
           renderItem={({ item }) => (
             <View style={styles.reelWrapper}>
-              <TouchableOpacity style={styles.reelContainer}>
+              <TouchableOpacity
+                style={styles.reelContainer}
+                onPress={() => openModal(item)}
+              >
                 <Video
                   source={{ uri: item.reelUrl }}
                   style={styles.reelVideo}
                   resizeMode="contain"
-                  useNativeControls
                 />
                 <View style={styles.reelButtonsBox}>
                   <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>

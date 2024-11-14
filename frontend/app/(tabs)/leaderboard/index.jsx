@@ -9,15 +9,15 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { BACKEND_URL } from "../../../env"; // Ensure your BACKEND_URL is correct
+import { BACKEND_URL } from "../../../env";
 import VideoModal from "../../../components/VideoModel";
 import Colors from "../../../constants/Colors";
 
 const Leaderboard = () => {
   const [rankingData, setRankingData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false); // Manage modal visibility
-  const [selectedUser, setSelectedUser] = useState(null); // Store selected user details
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetching ranking data from backend API
   const fetchRanking = async () => {
@@ -89,7 +89,25 @@ const Leaderboard = () => {
         renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => openModal(item)}>
             <View style={styles.rankItem}>
-              <Text style={styles.rank}>{index + 1}</Text>
+              {index + 1 === 1 ? (
+                <Image
+                  source={require("../../../assets/images/firstRank.png")}
+                  style={styles.rankImage}
+                />
+              ) : index + 1 === 2 ? (
+                <Image
+                  source={require("../../../assets/images/secondRank.png")}
+                  style={styles.rankImage}
+                />
+              ) : index + 1 === 3 ? (
+                <Image
+                  source={require("../../../assets/images/thirdRank.png")}
+                  style={styles.rankImage}
+                />
+              ) : (
+                <Text style={styles.rank}>{index + 1}</Text>
+              )}
+
               <Image
                 source={{ uri: item.profileImage }}
                 style={styles.profileImage}
@@ -107,7 +125,6 @@ const Leaderboard = () => {
         )}
       />
 
-      {/* Video Modal */}
       {selectedUser && (
         <VideoModal
           visible={modalVisible}
@@ -151,9 +168,9 @@ const styles = StyleSheet.create({
   },
   rankingList: {
     paddingHorizontal: 10,
-    flexDirection: "row", // Set items in a row
-    flexWrap: "wrap", // Allow wrapping of items
-    justifyContent: "space-between", // Space out the items
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   rankHeader: {
     fontSize: 16,
@@ -170,6 +187,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 10,
     padding: 15,
+    paddingLeft: 5,
     paddingRight: 20,
     marginBottom: 10,
     alignItems: "center",
@@ -181,6 +199,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.darkPink,
     marginRight: 15,
+    marginLeft: 10,
+  },
+  rankImage: {
+    height: 30,
+    width: 30,
+    marginRight: 6,
+    resizeMode: "contain",
   },
   profileImage: {
     width: 60,
@@ -202,6 +227,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10,
     gap: 50,
+    marginLeft: 15,
   },
   email: {
     fontSize: 15,

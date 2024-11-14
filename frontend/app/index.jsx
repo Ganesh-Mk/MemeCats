@@ -49,7 +49,6 @@ const Entrance = () => {
     setLoader(true);
     const name = await AsyncStorage.getItem("name");
     if (name === "" || name === null || name === undefined) {
-      console.log("Logout user or new User");
       dispatch(setRefreshTogglePlayPause(false));
       playSound();
     } else {

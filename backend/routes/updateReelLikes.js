@@ -16,8 +16,6 @@ router.post("/updateReelLikes", (req, res) => {
     { new: true } // Returns the updated document
   )
     .then((updatedReel) => {
-      console.log("Updated Reel: ", updatedReel);
-
       // If the user is liking the reel (isLiked = true), add it to likedReels array
       // If the user is unliking the reel (isLiked = false), remove it from likedReels array
       const updateOperation = isLiked
@@ -30,7 +28,6 @@ router.post("/updateReelLikes", (req, res) => {
         { new: true } // Return the updated user document
       )
         .then((updatedUser) => {
-          console.log("Updated User: ", updatedUser);
           res.send({
             message: isLiked
               ? "Reel liked and user saved successfully"
