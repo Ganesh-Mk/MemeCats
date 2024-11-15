@@ -35,12 +35,26 @@ const Reels = () => {
   const [paused, setPaused] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [reelsLoader, setReelsLoader] = useState(false);
+  let currentStart = 0;
+  const FETCH_REELS_LIMIT = 3;
 
   async function getData() {
     setReelsLoader(true);
-    const response = await fetch(`${BACKEND_URL}/getAllReels`);
-    const data = await response.json();
-    setData(data.allReels);
+
+    const response = await fetch(
+      `${BACKEND_URL}/getAllReels?start=${currentStart}&limit=${FETCH_REELS_LIMIT}`
+    );
+    const fetchData = await response.json();
+
+    if (fetchData.allReels && fetchData.allReels.length > 0) {
+      setData((prevReels) => [...prevReels, ...fetchData.allReels]);
+      currentStart += FETCH_REELS_LIMIT; // Update the start for the next call
+      console.log(`Fetched ${fetchData.allReels.length} reels.`);
+      console.log("Total reels in data: ", data.length);
+    } else {
+      console.log("No more reels to fetch.");
+    }
+
     setReelsLoader(false);
   }
 
@@ -99,6 +113,19 @@ const Reels = () => {
   const handleViewableItemsChanged = useCallback(
     ({ viewableItems, changed }) => {
       let nextPlayingIndex = null;
+
+      console.log(
+        "CurrentReeL: ",
+        viewableItems[0] && (viewableItems[0].index || 0)
+      );
+      if (
+        viewableItems[0] &&
+        viewableItems[0].index >= 0 && // Ensure the index is valid and non-negative
+        viewableItems[0].index % FETCH_REELS_LIMIT === 0 // Check if it's a multiple of FETCH_REELS_LIMIT
+      ) {
+        getData();
+      }
+
       changed.forEach((item) => {
         const videoRef = videoRefs.current[item.index];
         if (item.isViewable) {
@@ -192,57 +219,55 @@ const Reels = () => {
 
   const renderItem = ({ item, index }) => (
     <View style={styles.container}>
-      {reelsLoader ? (
-        <ActivityIndicator
-          size="large"
-          color={Colors.red}
-          style={styles.activityIndicator}
+      <View>
+        <Pressable
+          onPress={() => togglePlayPause(index)}
+          style={styles.overlay}
+        >
+          <Video
+            ref={(ref) => {
+              videoRefs.current[index] = ref;
+            }}
+            source={{ uri: item.reelUrl }}
+            style={styles.video}
+            useNativeControls={false}
+            resizeMode="cover"
+            isLooping
+            shouldPlay={index === currentIndex && !paused}
+            isMuted={muted}
+          />
+
+          <PlayPauseIcon paused={paused} />
+        </Pressable>
+
+        <BottomOverlay
+          profileImage={item.user.profileImage || null}
+          name={item.user.name}
+          desc={item.desc}
         />
-      ) : (
-        <View>
-          <Pressable
-            onPress={() => togglePlayPause(index)}
-            style={styles.overlay}
-          >
-            <Video
-              ref={(ref) => {
-                videoRefs.current[index] = ref;
-              }}
-              source={{ uri: item.reelUrl }}
-              style={styles.video}
-              useNativeControls={false}
-              resizeMode="cover"
-              isLooping
-              shouldPlay={index === currentIndex && !paused}
-              isMuted={muted}
+
+        <RightOverlay
+          handleReelLiked={() => handleReelLiked(item)}
+          handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
+          handleReelSave={() => handleReelSave(item._id)}
+          openCommentsModal={handleReelComments}
+          toggleMute={toggleMute}
+          muted={muted}
+          reel={item}
+          index={index}
+        />
+
+        {reelsLoader && (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator
+              size="small"
+              color={Colors.white}
+              style={styles.activityIndicator}
             />
-
-            <PlayPauseIcon paused={paused} />
-          </Pressable>
-
-          <BottomOverlay
-            profileImage={item.user.profileImage || null}
-            name={item.user.name}
-            desc={item.desc}
-          />
-
-          <RightOverlay
-            handleReelLiked={() => handleReelLiked(item)}
-            handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
-            handleReelSave={() => handleReelSave(item._id)}
-            openCommentsModal={handleReelComments}
-            toggleMute={toggleMute}
-            muted={muted}
-            reel={item}
-            index={index}
-          />
-
-          <CommentsOverlay
-            onCommentPress={() => handleReelComments(item)}
-            onCommentClose={closeCommentsModal}
-          />
-        </View>
-      )}
+            <Text style={styles.loadingText}>Loading more reels...</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 
@@ -258,7 +283,7 @@ const Reels = () => {
       onViewableItemsChanged={handleViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       contentContainerStyle={styles.contentContainerStyle}
-      refreshing={refreshing} // Add this
+      refreshing={refreshing}
       onRefresh={onRefresh}
     />
   );
@@ -276,8 +301,25 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  loaderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: "85%",
+    left: Dimensions.get("window").width / 2 - 40,
+    transform: [{ translateX: -50 }, { translateY: -50 }],
+    zIndex: 9999,
+    backgroundColor: "rgba(0, 0, 0, .3)",
+    padding: 10,
+    borderRadius: 10,
+  },
   activityIndicator: {
-    marginTop: 350,
+    marginRight: 10,
+  },
+  loadingText: {
+    fontSize: 12,
+    color: Colors.white,
   },
   overlay: {
     width: "100%",

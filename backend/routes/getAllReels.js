@@ -32,11 +32,17 @@ const sortReels = (reels) => {
 
 router.get("/getAllReels", async (req, res) => {
   try {
+    const { start = 0, limit = 3 } = req.query; // Default to 0 and 3 if not provided
     const reels = await Reel.find().populate("user", "name profileImage");
 
     if (reels && reels.length > 0) {
       const allReels = sortReels(reels);
-      return res.status(200).send({ allReels });
+      const slicedReels = allReels.slice(
+        parseInt(start),
+        parseInt(start) + parseInt(limit)
+      );
+
+      return res.status(200).send({ allReels: slicedReels });
     } else {
       return res.status(404).send({ message: "No Reels Found" });
     }
