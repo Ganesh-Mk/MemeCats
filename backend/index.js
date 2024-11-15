@@ -53,7 +53,7 @@ mongoose
   .catch((err) => console.error("Database Connection Failed: ", err));
 
 app.get("/", async (req, res) => {
-  const users = await User.find().populate("reels").populate("saveReels");
+  const users = await User.find().populate("reels");
   res.json(users);
   // res.send("Hello World!");
 });

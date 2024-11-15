@@ -15,7 +15,6 @@ router.post("/getUser", async (req, res) => {
           select: "name profileImage",
         },
       })
-      .populate("likedReels")
       .populate("reels");
 
     if (user) {

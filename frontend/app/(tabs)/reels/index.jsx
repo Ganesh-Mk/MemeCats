@@ -117,14 +117,10 @@ const Reels = () => {
     ({ viewableItems, changed }) => {
       let nextPlayingIndex = null;
 
-      console.log(
-        "CurrentReeL: ",
-        viewableItems[0] && (viewableItems[0].index || 0)
-      );
       if (
         viewableItems[0] &&
-        viewableItems[0].index >= 0 && // Ensure the index is valid and non-negative
-        viewableItems[0].index % FETCH_REELS_LIMIT === 0 // Check if it's a multiple of FETCH_REELS_LIMIT
+        viewableItems[0].index >= 0 &&
+        viewableItems[0].index % FETCH_REELS_LIMIT === 0
       ) {
         getData();
       }

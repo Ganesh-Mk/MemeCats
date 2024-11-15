@@ -4,9 +4,9 @@ const Reel = require("../models/reelsModel");
 const User = require("../models/userModel");
 
 router.post("/updateReelLikes", (req, res) => {
-  const { reelId, totalLikes, dailyLikes, userId, isLiked } = req.body;
+  const { reelId, totalLikes, dailyLikes } = req.body;
 
-  // Update the reel's like counts
+  // Update the reel's like counts only
   Reel.findByIdAndUpdate(
     reelId,
     {
@@ -16,28 +16,9 @@ router.post("/updateReelLikes", (req, res) => {
     { new: true } // Returns the updated document
   )
     .then((updatedReel) => {
-      // If the user is liking the reel (isLiked = true), add it to likedReels array
-      // If the user is unliking the reel (isLiked = false), remove it from likedReels array
-      const updateOperation = isLiked
-        ? { $addToSet: { likedReels: reelId } } // Add reelId to likedReels
-        : { $pull: { likedReels: reelId } }; // Remove reelId from likedReels
-
-      User.findByIdAndUpdate(
-        userId,
-        updateOperation, // Use the appropriate operation based on isLiked
-        { new: true } // Return the updated user document
-      )
-        .then((updatedUser) => {
-          res.send({
-            message: isLiked
-              ? "Reel liked and user saved successfully"
-              : "Reel unliked and user saved successfully",
-          });
-        })
-        .catch((err) => {
-          console.error("Error updating user:", err);
-          res.status(500).json({ error: "Error updating user" });
-        });
+      res.send({
+        message: "Reel like counts updated successfully",
+      });
     })
     .catch((err) => {
       console.error("Error updating reel:", err);

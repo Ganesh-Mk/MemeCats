@@ -12,17 +12,7 @@ import {
 } from "react-native";
 import { Video } from "expo-av"; // Import expo-av for video playback
 import CatButton from "./CatButton";
-
-// Colors object for the styling
-const Colors = {
-  lightPink: "#f8d8d8",
-  darkPink: "#ff69b4",
-  darkText: "#333",
-  subtleText: "#777",
-  lightGrey: "#f0f0f0",
-  white: "#fff",
-  red: "#e74c3c",
-};
+import Colors from "../constants/Colors";
 
 export default function VideoModal({
   visible,
@@ -62,7 +52,7 @@ export default function VideoModal({
               useNativeControls
               resizeMode="contain"
               shouldPlay
-              isLooping
+              onError={(error) => console.log("Video error:", error)}
             />
 
             {/* Likes */}
