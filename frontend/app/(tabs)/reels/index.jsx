@@ -18,6 +18,7 @@ import RightOverlay from "../../../components/RightOverlay";
 import CommentsOverlay from "../../../components/CommentsOverlay";
 import PlayPauseIcon from "../../../components/Icons/PlayPauseIcon";
 import Colors from "../../../constants/Colors";
+import ActiveLikedIcon from "../../../components/Icons/ActiveLikedIcon";
 
 const { height: screenHeight } = Dimensions.get("window");
 const viewabilityConfig = {
@@ -35,8 +36,9 @@ const Reels = () => {
   const [paused, setPaused] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [reelsLoader, setReelsLoader] = useState(false);
+  const [showIcon, setShowIcon] = useState(false);
   let currentStart = 0;
-  const FETCH_REELS_LIMIT = 3;
+  const FETCH_REELS_LIMIT = 5;
 
   async function getData() {
     setReelsLoader(true);
@@ -49,10 +51,10 @@ const Reels = () => {
     if (fetchData.allReels && fetchData.allReels.length > 0) {
       setData((prevReels) => [...prevReels, ...fetchData.allReels]);
       currentStart += FETCH_REELS_LIMIT; // Update the start for the next call
-      console.log(`Fetched ${fetchData.allReels.length} reels.`);
-      console.log("Total reels in data: ", data.length);
     } else {
-      console.log("No more reels to fetch.");
+      Alert.alert("No reels found", "Check your internet connection!", [
+        { text: "ok" },
+      ]);
     }
 
     setReelsLoader(false);
@@ -150,9 +152,13 @@ const Reels = () => {
   );
 
   const handleReelLiked = async (reel) => {
+    setShowIcon(true);
     reel.totalLikes += 1;
     reel.dailyLikes += 1;
-    "Reel Liked : ", reel.totalLikes;
+
+    setTimeout(() => {
+      setShowIcon(false); // Hide it after 1 second
+    }, 1000);
 
     const response = await fetch(`${BACKEND_URL}/updateReelLikes`, {
       method: "POST",
@@ -239,6 +245,7 @@ const Reels = () => {
           />
 
           <PlayPauseIcon paused={paused} />
+          <ActiveLikedIcon visible={showIcon} />
         </Pressable>
 
         <BottomOverlay

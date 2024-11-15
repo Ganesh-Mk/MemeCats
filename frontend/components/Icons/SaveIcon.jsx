@@ -23,8 +23,6 @@ const SaveIcon = ({ reel, handleReelSaved }) => {
         // Safely access savedReels from the response
         const savedReelIds = data.savedReels?.map((reel) => reel._id);
 
-        console.log("User savedReels:", savedReelIds);
-
         if (reel && savedReelIds) {
           const isReelSaved = savedReelIds.includes(reel._id);
           setSaved(isReelSaved);

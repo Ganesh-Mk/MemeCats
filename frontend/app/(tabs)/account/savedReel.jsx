@@ -44,7 +44,6 @@ const SavedReel = ({ email }) => {
       }
 
       const data = await response.json();
-      console.log(user);
       if (data.user) {
         setSavedReels(data.user.saveReels);
         setLoader(false);
