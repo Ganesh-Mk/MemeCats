@@ -1,24 +1,44 @@
 import React, { useState, useEffect } from "react";
-import Svg, { G, Path } from "react-native-svg";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import Colors from "../../constants/Colors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BACKEND_URL } from "../../env";
 import { useSelector } from "react-redux";
+import { BACKEND_URL } from "../../env";
 
 const SaveIcon = ({ reel, handleReelSaved }) => {
   const user = useSelector((state) => state.user);
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    const checkSavedStatus = async () => {
-      const storedSaveStatus = await AsyncStorage.getItem(`saved_${reel._id}`);
-      if (storedSaveStatus === "true") {
-        setSaved(true);
-      }
-    };
+  const getUserData = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/getUser`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+      });
 
-    checkSavedStatus();
+      if (response.ok) {
+        const data = await response.json();
+
+        // Safely access savedReels from the response
+        const savedReelIds = data.savedReels?.map((reel) => reel._id);
+
+        console.log("User savedReels:", savedReelIds);
+
+        if (reel && savedReelIds) {
+          const isReelSaved = savedReelIds.includes(reel._id);
+          setSaved(isReelSaved);
+        }
+      } else {
+        console.error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error getting user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getUserData();
   }, [reel._id]);
 
   const handleDeleteReel = async (reelId) => {
@@ -34,8 +54,6 @@ const SaveIcon = ({ reel, handleReelSaved }) => {
       if (!response.ok) {
         throw new Error("Failed to delete saved reel");
       }
-
-      // Optionally, update local state or UI after deleting
     } catch (error) {
       console.error("Error deleting reel:", error);
     }
@@ -44,8 +62,6 @@ const SaveIcon = ({ reel, handleReelSaved }) => {
   const handlePress = async () => {
     const newSavedState = !saved;
     setSaved(newSavedState);
-
-    await AsyncStorage.setItem(`saved_${reel._id}`, newSavedState.toString());
 
     if (newSavedState) {
       handleReelSaved();

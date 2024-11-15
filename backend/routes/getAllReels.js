@@ -32,15 +32,35 @@ const sortReels = (reels) => {
 
 router.get("/getAllReels", async (req, res) => {
   try {
-    const { start = 0, limit = 3 } = req.query; // Default to 0 and 3 if not provided
+    const { start = 0, limit = 3 } = req.query;
     const reels = await Reel.find().populate("user", "name profileImage");
 
     if (reels && reels.length > 0) {
       const allReels = sortReels(reels);
+
+      // Handle the case when start + limit exceeds the number of reels
+      const startIndex = parseInt(start);
+      const limitIndex = parseInt(limit);
+
+      // If start index is greater than or equal to the length of reels, reset start to 0
+      const adjustedStart = startIndex >= allReels.length ? 0 : startIndex;
+
+      // Slice the reels to get the requested range
       const slicedReels = allReels.slice(
-        parseInt(start),
-        parseInt(start) + parseInt(limit)
+        adjustedStart,
+        adjustedStart + limitIndex
       );
+
+      // If the slice exceeds the length of the array, loop back from the beginning
+      if (slicedReels.length < limitIndex) {
+        const remainingReels = allReels.slice(
+          0,
+          limitIndex - slicedReels.length
+        );
+        return res
+          .status(200)
+          .send({ allReels: [...slicedReels, ...remainingReels] });
+      }
 
       return res.status(200).send({ allReels: slicedReels });
     } else {

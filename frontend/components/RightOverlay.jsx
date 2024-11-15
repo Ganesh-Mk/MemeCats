@@ -9,8 +9,6 @@ const RightOverlay = ({
   handleReelLiked,
   handleReelLikeRemoved,
   handleReelSave,
-
-  openCommentsModal,
   toggleMute,
   muted,
   reel,

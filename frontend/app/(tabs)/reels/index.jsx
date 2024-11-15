@@ -64,6 +64,7 @@ const Reels = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    setData([]);
     await getData();
     setRefreshing(false);
   };
