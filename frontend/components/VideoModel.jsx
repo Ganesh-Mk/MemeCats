@@ -10,7 +10,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import { Video } from "expo-av"; // Import expo-av for video playback
+import { Video } from "expo-av";
 import CatButton from "./CatButton";
 import Colors from "../constants/Colors";
 

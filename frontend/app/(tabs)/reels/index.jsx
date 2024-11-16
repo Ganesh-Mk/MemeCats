@@ -31,6 +31,7 @@ const Reels = () => {
   const videoRefs = useRef([]);
 
   const [data, setData] = useState([]);
+  const [errorReels, setErrorReels] = useState(new Set());
   const [muted, setMuted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [paused, setPaused] = useState(false);
@@ -144,7 +145,7 @@ const Reels = () => {
         }
       }
     },
-    [currentIndex, videoRefs, setPaused]
+    [currentIndex, videoRefs]
   );
 
   const handleReelLiked = async (reel) => {
@@ -216,64 +217,72 @@ const Reels = () => {
     }
   };
 
-  const openCommentsModal = (item) => {};
+  const handleError = (index) => {
+    setErrorReels((prev) => new Set(prev.add(index))); // Mark the reel as having an error
+  };
 
-  const closeCommentsModal = () => {};
+  const renderItem = ({ item, index }) => {
+    // Check if the reel has an error and skip rendering
+    if (errorReels.has(index)) {
+      return null; // Skip rendering the reel if it has an error
+    }
 
-  const renderItem = ({ item, index }) => (
-    <View style={styles.container}>
-      <View>
-        <Pressable
-          onPress={() => togglePlayPause(index)}
-          style={styles.overlay}
-        >
-          <Video
-            ref={(ref) => {
-              videoRefs.current[index] = ref;
-            }}
-            source={{ uri: item.reelUrl }}
-            style={styles.video}
-            useNativeControls={false}
-            resizeMode="cover"
-            isLooping
-            shouldPlay={index === currentIndex && !paused}
-            isMuted={muted}
+    return (
+      <View style={styles.container}>
+        <View>
+          <Pressable
+            onPress={() => togglePlayPause(index)}
+            style={styles.overlay}
+          >
+            <Video
+              ref={(ref) => {
+                videoRefs.current[index] = ref;
+              }}
+              source={{ uri: item.reelUrl }}
+              style={styles.video}
+              useNativeControls={false}
+              resizeMode="cover"
+              isLooping
+              shouldPlay={index === currentIndex && !paused}
+              isMuted={muted}
+              onError={() => handleError(index)} // Handle error
+            />
+
+            <PlayPauseIcon paused={paused} />
+            <ActiveLikedIcon visible={showIcon} />
+          </Pressable>
+
+          <BottomOverlay
+            profileImage={item.user.profileImage || null}
+            name={item.user.name}
+            desc={item.desc}
           />
 
-          <PlayPauseIcon paused={paused} />
-          <ActiveLikedIcon visible={showIcon} />
-        </Pressable>
+          <RightOverlay
+            handleReelLiked={() => handleReelLiked(item)}
+            handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
+            handleReelSave={() => handleReelSave(item._id)}
+            openCommentsModal={handleReelComments}
+            toggleMute={toggleMute}
+            muted={muted}
+            reel={item}
+            index={index}
+          />
 
-        <BottomOverlay
-          profileImage={item.user.profileImage || null}
-          name={item.user.name}
-          desc={item.desc}
-        />
-
-        <RightOverlay
-          handleReelLiked={() => handleReelLiked(item)}
-          handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
-          handleReelSave={() => handleReelSave(item._id)}
-          openCommentsModal={handleReelComments}
-          toggleMute={toggleMute}
-          muted={muted}
-          reel={item}
-          index={index}
-        />
-
-        {reelsLoader && (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator
-              size="small"
-              color={Colors.white}
-              style={styles.activityIndicator}
-            />
-            <Text style={styles.loadingText}>Loading more reels...</Text>
-          </View>
-        )}
+          {reelsLoader && (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator
+                size="small"
+                color={Colors.white}
+                style={styles.activityIndicator}
+              />
+              <Text style={styles.loadingText}>Loading more reels...</Text>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <FlatList
