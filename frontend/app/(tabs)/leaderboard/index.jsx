@@ -86,7 +86,7 @@ const Leaderboard = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../../assets/images/memeCats/catWithGoggle.png")}
+        source={require("../../../assets/images/podium.png")}
         style={styles.image}
       />
       <Text style={styles.headerText}>Meme Cats of the Day</Text>
@@ -183,12 +183,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightPink,
   },
   image: {
-    height: 150,
+    height: 200,
     resizeMode: "contain",
     alignSelf: "center",
-    marginTop: 30,
   },
-
   container: {
     flex: 1,
     backgroundColor: Colors.lightPink,

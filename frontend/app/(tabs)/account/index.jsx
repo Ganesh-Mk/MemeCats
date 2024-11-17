@@ -214,6 +214,16 @@ export default function AccountScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerText}>Reels</Text>
+
+      {reels.length === 0 && (
+        <View style={styles.noReelsContainer}>
+          <Image
+            source={require("../../../assets/images/memeCats/sideEyeCat1.gif")}
+            style={styles.noReelsImage}
+          />
+          <Text style={styles.noReelsText}>Add new reels hooman!</Text>
+        </View>
+      )}
       <FlatList
         data={reels}
         numColumns={2}
@@ -251,6 +261,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightPink,
     padding: 20,
+  },
+  noReelsContainer: {
+    height: "78%",
+    alignItems: "center",
+  },
+  noReelsImage: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+    marginTop: 50,
+  },
+  noReelsText: {
+    fontSize: 20,
+    fontFamily: "Bold",
+    marginTop: 10,
+    color: Colors.black,
+    marginRight: 10,
   },
   header: {
     backgroundColor: Colors.lightPink,
