@@ -1,5 +1,4 @@
-// Leaderboard.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,39 +11,65 @@ import {
 import { BACKEND_URL } from "../../../env";
 import VideoModal from "../../../components/VideoModel";
 import Colors from "../../../constants/Colors";
+import CatButton from "../../../components/CatButton";
 
 const Leaderboard = () => {
   const [rankingData, setRankingData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-
-  // Fetching ranking data from backend API
+  const [hasMoreData, setHasMoreData] = useState(true); // To track if there is more data to load
+  const [buttonLoading, setButtonLoading] = useState(false); // To track the loader for the button
+  const [rankFinished, setRankFinished] = useState(false);
+  const page = useRef(1); // Using a ref to store the page number
+  // Fetch ranking data
   const fetchRanking = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${BACKEND_URL}/getRanking`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const start = (page.current - 1) * 10 + 1; // Calculate start index for the current page
+      const end = start + 9; // Calculate end index (top 10 for current page)
 
+      const response = await fetch(
+        `${BACKEND_URL}/getRanking?start=${start}&end=${end}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
-        setRankingData(data);
-      } else {
-        console.error("Failed to fetch ranking data:", response.statusText);
-      }
 
-      setLoading(false);
+        // If no data is returned, stop fetching more data
+        if (data.length === 0) {
+          setHasMoreData(false);
+        } else {
+          // Append new data to the existing ranking data
+          setRankingData((prevData) => [...prevData, ...data]);
+        }
+      } else {
+        setRankFinished(true);
+      }
     } catch (error) {
-      console.error("Error fetching ranking data:", error);
+      console.log("Error fetching ranking data/Finished", error);
+    } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    fetchRanking();
-  }, []);
+    if (hasMoreData) {
+      fetchRanking();
+    }
+  }, [hasMoreData]); // Triggering fetch only when data is available to fetch
+
+  const loadMore = () => {
+    if (!loading && hasMoreData) {
+      page.current += 1; // Increment the page number
+      fetchRanking(); // Fetch next set of data
+    }
+  };
 
   // Handle opening the modal with selected user
   const openModal = (user) => {
@@ -57,14 +82,6 @@ const Leaderboard = () => {
     setModalVisible(false);
     setSelectedUser(null);
   };
-
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color={Colors.darkPink} />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -85,7 +102,7 @@ const Leaderboard = () => {
         showsVerticalScrollIndicator={false}
         refreshing={loading}
         onRefresh={() => fetchRanking()}
-        keyExtractor={(item) => item.reelId}
+        keyExtractor={(item, i) => `item.reelId-${item.reelId} index-${i}`}
         renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => openModal(item)}>
             <View style={styles.rankItem}>
@@ -123,6 +140,23 @@ const Leaderboard = () => {
             </View>
           </TouchableOpacity>
         )}
+        ListFooterComponent={
+          rankFinished ? (
+            <CatButton
+              onPress={loadMore}
+              text="No more Cat of the day"
+              fontFamily={"Bold"}
+              loading={buttonLoading} // Show loader for the button
+            />
+          ) : (
+            <CatButton
+              onPress={loadMore}
+              text="Load More"
+              fontFamily={"Bold"}
+              loading={buttonLoading} // Show loader for the button
+            />
+          )
+        }
       />
 
       {selectedUser && (
@@ -154,6 +188,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 30,
   },
+
   container: {
     flex: 1,
     backgroundColor: Colors.lightPink,
@@ -186,7 +221,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: Colors.white,
     borderRadius: 10,
-    padding: 15,
+    padding: 10,
     paddingLeft: 5,
     paddingRight: 20,
     marginBottom: 10,
@@ -226,8 +261,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
-    gap: 50,
-    marginLeft: 15,
+    gap: 30,
+    marginLeft: 0,
+    marginLeft: 10,
   },
   email: {
     fontSize: 15,
@@ -237,8 +273,9 @@ const styles = StyleSheet.create({
   likes: {
     fontSize: 18,
     fontFamily: "Regular",
-    textAlign: "center",
     color: Colors.darkPink,
+    width: 25,
+    textAlign: "center",
   },
 });
 

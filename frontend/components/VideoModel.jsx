@@ -37,12 +37,12 @@ export default function VideoModal({
                 />
                 <Text style={styles.name}>{name}</Text>
               </View>
-              <CatButton
-                fontFamily="Bold"
-                text="X"
-                width={50}
-                onPress={onClose}
-              />
+              <TouchableOpacity onPress={onClose}>
+                <Image
+                  style={styles.cancelIcon}
+                  source={require("../assets/images/cancelIcon.png")}
+                />
+              </TouchableOpacity>
             </View>
 
             {/* Video Section */}
@@ -113,6 +113,11 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     width: 130,
     flexWrap: "wrap",
+  },
+  cancelIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
   video: {
     width: "100%",
