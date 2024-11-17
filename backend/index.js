@@ -28,6 +28,7 @@ const updateReelLikesRouter = require("./routes/updateReelLikes");
 const saveReelRouter = require("./routes/saveReel");
 const deleteSavedReelRouter = require("./routes/deleteSavedReel");
 const getRankingRouter = require("./routes/getRanking");
+const getAIResponseRouter = require("./routes/getAIResponse");
 
 app.use(signupRouter);
 app.use(loginRouter);
@@ -42,6 +43,7 @@ app.use(updateReelLikesRouter);
 app.use(saveReelRouter);
 app.use(deleteSavedReelRouter);
 app.use(getRankingRouter);
+app.use(getAIResponseRouter);
 
 const User = require("./models/userModel");
 
@@ -53,9 +55,22 @@ mongoose
   .catch((err) => console.error("Database Connection Failed: ", err));
 
 app.get("/", async (req, res) => {
-  const users = await User.find().populate("reels");
-  res.json(users);
+  // const users = await User.find().populate("reels");
+  // res.json(users);
   // res.send("Hello World!");
+
+  const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+  const genAI = new GoogleGenerativeAI(
+    "AIzaSyBT0T1a9eItu0-MQaRG-AQZnR_MYaEB66c"
+  );
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const prompt = "Explain how AI works";
+
+  const result = await model.generateContent(prompt);
+  console.log(result.response.text());
+  res.send("Hello World!");
 });
 
 app.get("/getAllReels", getAllReelsRouter);
@@ -69,6 +84,7 @@ app.post("/login", loginRouter);
 app.post("/createReel", createReelRouter);
 app.post("/updateReelLikes", updateReelLikesRouter);
 app.post("/saveReel", saveReelRouter);
+app.post("/getAIResponse", getAIResponseRouter);
 
 app.patch("/editProfile", editProfileRouter);
 

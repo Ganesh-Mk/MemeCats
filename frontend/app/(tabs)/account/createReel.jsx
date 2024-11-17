@@ -8,16 +8,18 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import Colors from "../../../constants/Colors";
 import { useDispatch, useSelector } from "react-redux";
 import { BACKEND_URL } from "../../../env";
+import { GEMINI_API_KEY } from "../../../env";
 import { storeReels, storeRefreshUser } from "../../../store/user.js";
 import { Image } from "react-native";
 import { Video } from "expo-av";
 import { router } from "expo-router";
 import CatButton from "../../../components/CatButton";
+import CaptionsModel from "../../../components/CaptionsModel";
 
 export default function CreateReel() {
   const [media, setMedia] = useState(null); // holds the image or video URI
@@ -26,6 +28,10 @@ export default function CreateReel() {
   const [desc, setDesc] = useState("");
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const [buttonLoader, setButtonLoader] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   const pickMedia = async () => {
     setLoaderSelecting(true);
@@ -96,8 +102,25 @@ export default function CreateReel() {
     }
   };
 
+  const onConfirmModel = () => {
+    setModalVisible(false);
+  };
+
+  const openAIModel = async () => {
+    setModalVisible(true);
+  };
+
+  const closeAIModel = () => {
+    setModalVisible(false);
+  };
+
   return (
     <ScrollView>
+      <CaptionsModel
+        visible={isModalVisible}
+        closeModel={closeAIModel}
+        onSelect={(cap) => setDesc(cap)}
+      />
       <View style={styles.container}>
         <Text style={styles.headerText}>Hey Hooman, make me famous! 🐱</Text>
 
@@ -122,13 +145,22 @@ export default function CreateReel() {
           </TouchableOpacity>
         )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Add a description"
-          value={desc}
-          multiline={true}
-          onChangeText={setDesc}
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Add a caption..."
+            value={desc}
+            multiline={true}
+            onChangeText={setDesc}
+          />
+          <TouchableOpacity onPress={openAIModel} style={styles.aiBox}>
+            <Image
+              source={require("../../../assets/images/gemini.png")}
+              style={styles.aiIcon}
+            />
+            <Text style={styles.aiText}>AI Caption</Text>
+          </TouchableOpacity>
+        </View>
 
         <CatButton
           text="Upload"
@@ -164,16 +196,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pickMediaText: { color: "white", fontSize: 16 },
+  inputContainer: {
+    width: "100%",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    marginBottom: 15,
+    flexDirection: "row",
+    gap: 10,
+  },
+  aiBox: {
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 5,
+    borderRadius: 10,
+    borderColor: Colors.lightBlue,
+    borderWidth: 2,
+  },
+  aiIcon: {
+    height: 30,
+    width: 30,
+    resizeMode: "contain",
+  },
+  aiText: {
+    color: Colors.black,
+    fontSize: 14,
+    fontFamily: "Regular",
+  },
   input: {
-    height: 50,
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
-    height: 100,
     fontSize: 20,
     paddingHorizontal: 15,
-    marginBottom: 15,
-    width: "100%",
+    paddingVertical: 15,
+    width: "70%",
     backgroundColor: "#fff",
   },
   mediaBox: {

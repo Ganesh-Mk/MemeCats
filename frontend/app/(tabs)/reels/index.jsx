@@ -218,7 +218,7 @@ const Reels = () => {
   };
 
   const handleError = (index) => {
-    setErrorReels((prev) => new Set(prev.add(index))); // Mark the reel as having an error
+    setErrorReels((prev) => new Set(prev.add(index)));
   };
 
   const renderItem = ({ item, index }) => {
