@@ -1,10 +1,5 @@
-import React from "react";
-import {
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, TouchableOpacity, ActivityIndicator, View } from "react-native";
 import Colors from "../constants/Colors";
 
 const CatButton = ({ text, loading, fontFamily, fontSize, onPress, width }) => {
@@ -20,11 +15,30 @@ const CatButton = ({ text, loading, fontFamily, fontSize, onPress, width }) => {
       onPress={onPress}
     >
       {loading ? (
-        <ActivityIndicator
-          color={Colors.white}
-          size="large"
-          style={{ height: 25 }}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+          }}
+        >
+          <ActivityIndicator
+            color={Colors.white}
+            size="large"
+            style={{ height: 25 }}
+          />
+          <Text
+            style={{
+              fontFamily: fontFamily || "Regular",
+              fontSize: fontSize || 20,
+              textAlign: "center",
+              color: Colors.white,
+            }}
+          >
+            Wait Hooman...
+          </Text>
+        </View>
       ) : (
         <Text
           style={[

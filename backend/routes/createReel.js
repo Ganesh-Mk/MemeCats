@@ -48,6 +48,7 @@ router.post("/createReel", upload.single("file"), async (req, res) => {
         },
         (error, result) => {
           if (error) {
+            console.error(" Cloudinary Error:", error.message);
             reject(new Error("Cloudinary upload failed"));
           } else {
             resolve(result);

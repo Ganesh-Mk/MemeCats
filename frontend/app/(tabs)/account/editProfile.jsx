@@ -8,7 +8,6 @@ import {
   Image,
   Alert,
   ScrollView,
-  KeyboardAvoidingView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -27,7 +26,6 @@ const EditProfile = () => {
   const [galleryLoader, setGalleryLoader] = useState(false);
   const dispatch = useDispatch();
 
-  // Request permissions on mount
   useEffect(() => {
     const requestPermissions = async () => {
       const { status } =
@@ -46,12 +44,10 @@ const EditProfile = () => {
   const handleEditProfile = async () => {
     setLoading(true);
 
-    // Prepare the form data
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", user.email);
     if (profileImage) {
-      // Attach image with required metadata for React Native
       formData.append("profileImage", {
         uri: profileImage,
         name: "profileImage.jpg",
@@ -62,7 +58,7 @@ const EditProfile = () => {
     try {
       const response = await fetch(`${BACKEND_URL}/editProfile`, {
         method: "PATCH",
-        body: formData, // Pass formData directly as the body
+        body: formData,
       });
 
       const data = await response.json();
@@ -150,7 +146,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.lightGrey, // Fallback color if the image doesn't load
+    backgroundColor: Colors.lightGrey,
   },
   headerText: {
     fontSize: 32,
