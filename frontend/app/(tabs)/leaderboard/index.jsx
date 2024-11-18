@@ -102,7 +102,6 @@ const Leaderboard = () => {
         data={rankingData}
         showsVerticalScrollIndicator={false}
         refreshing={loading}
-        onRefresh={() => fetchRanking()}
         keyExtractor={(item, i) => `item.reelId-${item.reelId} index-${i}`}
         renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => openModal(item)}>
@@ -145,16 +144,16 @@ const Leaderboard = () => {
           rankFinished ? (
             <CatButton
               onPress={loadMore}
-              text="No more Cat of the day"
+              text="No more Cats of the day"
               fontFamily={"Bold"}
-              loading={buttonLoading} // Show loader for the button
+              loading={loading}
             />
           ) : (
             <CatButton
               onPress={loadMore}
               text="Load More"
               fontFamily={"Bold"}
-              loading={buttonLoading} // Show loader for the button
+              loading={loading}
             />
           )
         }

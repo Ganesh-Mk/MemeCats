@@ -159,6 +159,7 @@ export default function AccountScreen() {
           videoUrl={selectedReel.reelUrl}
           profileImage={profileImage}
           name={name}
+          comments={selectedReel.comments}
           dailyLikes={selectedReel.dailyLikes}
           totalLikes={selectedReel.totalLikes}
           description={selectedReel.desc}

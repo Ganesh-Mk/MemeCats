@@ -9,10 +9,11 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  Pressable,
 } from "react-native";
 import { Video } from "expo-av";
-import CatButton from "./CatButton";
 import Colors from "../constants/Colors";
+import { Path, Svg } from "react-native-svg";
 
 export default function VideoModal({
   visible,
@@ -20,54 +21,64 @@ export default function VideoModal({
   videoUrl,
   profileImage,
   name,
+  commentsCount,
   dailyLikes,
   totalLikes,
-  description,
 }) {
   return (
     <Modal transparent visible={visible} animationType="fade">
-      <ScrollView>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <View style={styles.profileContainer}>
-                <Image
-                  source={{ uri: profileImage }}
-                  style={styles.profileImage}
-                />
-                <Text style={styles.name}>{name}</Text>
-              </View>
-              <TouchableOpacity onPress={onClose}>
-                <Image
-                  style={styles.cancelIcon}
-                  source={require("../assets/images/cancelIcon.png")}
-                />
-              </TouchableOpacity>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.profileContainer}>
+              <Image
+                source={{ uri: profileImage }}
+                style={styles.profileImage}
+              />
+              <Text style={styles.name}>{name}</Text>
             </View>
-
-            {/* Video Section */}
-            <Video
-              source={{ uri: videoUrl }}
-              style={styles.video}
-              useNativeControls
-              resizeMode="contain"
-              shouldPlay
-              onError={(error) => console.log("Video error:", error)}
-            />
-
-            {/* Likes */}
-            <View style={styles.likesContainer}>
-              <Text style={styles.likes}>💖 {dailyLikes}</Text>
-              <Text style={styles.likes}>💞 {totalLikes}</Text>
-            </View>
-
-            {/* Description */}
-            <ScrollView style={styles.descriptionContainer}>
-              <Text style={styles.description}>{description}</Text>
-            </ScrollView>
+            <TouchableOpacity onPress={onClose}>
+              <Image
+                style={styles.cancelIcon}
+                source={require("../assets/images/cancelIcon.png")}
+              />
+            </TouchableOpacity>
           </View>
+
+          {/* Video Section */}
+          <Video
+            source={{ uri: videoUrl }}
+            style={styles.video}
+            useNativeControls
+            resizeMode="contain"
+            shouldPlay
+            onError={(error) => console.log("Video error:", error)}
+          />
+
+          {/* Likes and Comments */}
+          {/* <View style={styles.likesContainer}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Svg
+                height={30}
+                width={45}
+                viewBox="0 0 512 512"
+                xmlSpace="preserve"
+              >
+                <Path
+                  d="M474.655,74.503C449.169,45.72,413.943,29.87,375.467,29.87c-30.225,0-58.5,12.299-81.767,35.566 c-15.522,15.523-28.33,35.26-37.699,57.931c-9.371-22.671-22.177-42.407-37.699-57.931c-23.267-23.267-51.542-35.566-81.767-35.566 c-38.477,0-73.702,15.851-99.188,44.634C13.612,101.305,0,137.911,0,174.936c0,44.458,13.452,88.335,39.981,130.418 c21.009,33.324,50.227,65.585,86.845,95.889c62.046,51.348,123.114,78.995,125.683,80.146c2.203,0.988,4.779,0.988,6.981,0 c2.57-1.151,63.637-28.798,125.683-80.146c36.618-30.304,65.836-62.565,86.845-95.889C498.548,263.271,512,219.394,512,174.936 C512,137.911,498.388,101.305,474.655,74.503z"
+                  fill="transparent"
+                  stroke="white"
+                  strokeWidth="50"
+                />
+              </Svg>
+              <Text style={styles.likes}>{totalLikes}</Text>
+            </View>
+
+            <Text style={styles.likes}>💬 {commentsCount}</Text>
+          </View> */}
         </View>
-      </ScrollView>
+      </View>
     </Modal>
   );
 }
@@ -81,38 +92,38 @@ const styles = StyleSheet.create({
     height: Dimensions.get("window").height * 0.939,
   },
   modalContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.darkTransparent,
     borderRadius: 10,
-    padding: 20,
     width: "90%",
     maxWidth: 400,
     height: "95%",
     alignItems: "center",
+    position: "relative",
   },
   header: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    right: 20,
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 15,
+    alignItems: "center",
+    zIndex: 1,
   },
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginRight: 15,
   },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    color: Colors.darkText,
-    marginLeft: 5,
-    width: 130,
-    flexWrap: "wrap",
+    color: Colors.white,
   },
   cancelIcon: {
     width: 40,
@@ -121,47 +132,23 @@ const styles = StyleSheet.create({
   },
   video: {
     width: "100%",
-    height: 400,
-    borderRadius: 10,
-    marginBottom: 15,
+    height: "100%",
     borderRadius: 10,
   },
   likesContainer: {
+    position: "absolute",
+    bottom: 10,
+    left: 20,
+    right: 20,
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "100%",
-    marginBottom: 15,
+    alignItems: "center",
+    zIndex: 1,
   },
   likes: {
-    fontSize: 16,
-    color: Colors.darkPink,
-  },
-  descriptionContainer: {
-    width: "100%",
-    marginBottom: 5,
-    height: 200,
-    textAlign: "center",
-  },
-  description: {
-    fontSize: 18,
-
-    fontFamily: "Regular",
-    color: Colors.darkText,
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  closeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: Colors.red,
-    width: 50,
-    height: 50,
-    borderRadius: 100,
-  },
-  closeButtonText: {
-    color: Colors.white,
     fontSize: 20,
+    fontFamily: "Regular",
+    color: Colors.white,
     textAlign: "center",
-    fontFamily: "Bold",
   },
 });

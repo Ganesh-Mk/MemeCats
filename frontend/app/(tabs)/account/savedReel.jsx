@@ -152,6 +152,7 @@ const SavedReel = ({ email }) => {
                   source={{ uri: item.reelUrl }}
                   style={styles.reelVideo}
                   resizeMode="contain"
+                  onError={() => console.log("video error")}
                 />
                 <View style={styles.reelButtonsBox}>
                   <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>
