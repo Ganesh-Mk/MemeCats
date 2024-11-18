@@ -32,11 +32,15 @@ const sortReels = (reels) => {
 
 router.get("/getAllReels", async (req, res) => {
   try {
-    const { start = 0, limit = 5 } = req.query;
-    const reels = await Reel.find().populate("user", "name profileImage");
+    const { start = 0, limit = 5, shuffle } = req.query;
+    let reels = await Reel.find().populate("user", "name profileImage");
 
     if (reels && reels.length > 0) {
-      const allReels = sortReels(reels);
+      let allReels = sortReels(reels);
+
+      if (shuffle === "true") {
+        allReels = allReels.sort(() => Math.random() - 0.5);
+      }
 
       // Handle the case when start + limit exceeds the number of reels
       const startIndex = parseInt(start);

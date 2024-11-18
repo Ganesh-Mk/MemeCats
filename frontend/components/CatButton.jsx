@@ -6,11 +6,19 @@ const CatButton = ({ text, loading, fontFamily, fontSize, onPress, width }) => {
   return (
     <TouchableOpacity
       style={{
+        width: width || "100%",
         backgroundColor: Colors.red,
         paddingHorizontal: 8,
         paddingVertical: 10,
         borderRadius: 10,
-        width: width || "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        shadowColor: "#000", // shadow effect
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 5,
       }}
       onPress={onPress}
     >

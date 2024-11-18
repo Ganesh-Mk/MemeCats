@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import Colors from "../../constants/Colors";
 import { Link, router } from "expo-router";
@@ -7,10 +7,13 @@ import CatButton from "../../components/CatButton";
 const LoginOrSignup = () => {
   return (
     <View style={styles.screen}>
-      <Image
-        source={require("../../assets/gif/huhCat.gif")}
-        style={styles.image}
-      />
+      <View>
+        <Image
+          source={require("../../assets/gif/huhCat.gif")}
+          style={styles.image}
+        />
+        <Text style={styles.huhText}>Huh?</Text>
+      </View>
 
       <CatButton
         fontFamily={"Bold"}
@@ -55,7 +58,16 @@ const styles = StyleSheet.create({
     height: 320,
     color: Colors.black,
     marginBottom: 40,
-    marginLeft: 30,
+    marginLeft: 80,
+  },
+  huhText: {
+    position: "absolute",
+    top: "20%",
+    left: "20%",
+    zIndex: 10,
+    fontSize: 40,
+    fontFamily: "Bold",
+    color: Colors.black,
   },
 
   btnBox: {

@@ -102,6 +102,9 @@ const EditProfile = () => {
           {galleryLoader ? (
             <View style={styles.profileImage}>
               <ActivityIndicator size="large" color={Colors.primary} />
+              <Text style={{ fontFamily: "Regular", color: Colors.darkGrey }}>
+                Opening Gallery...
+              </Text>
             </View>
           ) : (
             <Image
@@ -123,6 +126,7 @@ const EditProfile = () => {
         <CatButton
           text="Save Changes"
           loading={loading}
+          fontFamily={"Bold"}
           onPress={handleEditProfile}
         />
       </View>

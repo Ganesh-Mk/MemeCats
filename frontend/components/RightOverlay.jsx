@@ -33,7 +33,6 @@ const RightOverlay = ({
       if (response.ok) {
         const data = await response.json();
         setCommentsCount(data.length);
-        console.log("fetched comment length: , ", data.length);
       }
     } catch (err) {
       Alert.alert("Error while fetching comments", err.message);

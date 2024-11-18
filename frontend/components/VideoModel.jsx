@@ -1,5 +1,5 @@
 // components/VideoModal.js
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -25,6 +25,8 @@ export default function VideoModal({
   dailyLikes,
   totalLikes,
 }) {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.modalOverlay}>
@@ -47,14 +49,24 @@ export default function VideoModal({
           </View>
 
           {/* Video Section */}
-          <Video
-            source={{ uri: videoUrl }}
-            style={styles.video}
-            useNativeControls
-            resizeMode="contain"
-            shouldPlay
-            onError={(error) => console.log("Video error:", error)}
-          />
+
+          {!hasError ? (
+            <Video
+              source={{ uri: videoUrl }}
+              style={styles.video}
+              useNativeControls
+              resizeMode="contain"
+              shouldPlay
+              onError={() => setHasError(true)}
+            />
+          ) : (
+            <View style={styles.errorTextContainer}>
+              <Text style={styles.errorText}>Something went wrong!</Text>
+              <Text style={[styles.errorText, { marginTop: 10 }]}>
+                Restart app
+              </Text>
+            </View>
+          )}
 
           {/* Likes and Comments */}
           {/* <View style={styles.likesContainer}>
@@ -90,6 +102,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     height: Dimensions.get("window").height * 0.939,
+  },
+  errorTextContainer: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorText: {
+    fontFamily: "Regular",
+    fontSize: 16,
+    textAlign: "center",
+    color: Colors.white,
   },
   modalContainer: {
     backgroundColor: Colors.darkTransparent,

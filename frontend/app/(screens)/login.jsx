@@ -25,6 +25,7 @@ import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { Ionicons } from "@expo/vector-icons";
+import CatButton from "../../components/CatButton";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -138,17 +139,13 @@ const Login = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.btnBox}
+        <CatButton
+          fontFamily={"Bold"}
+          loading={loading}
+          text="Submit Meow!"
+          fontSize={25}
           onPress={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={Colors.white} size="large" />
-          ) : (
-            <Text style={styles.btnText}>Submit Meow!</Text>
-          )}
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   );

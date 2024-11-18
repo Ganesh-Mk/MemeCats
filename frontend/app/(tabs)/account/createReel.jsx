@@ -13,7 +13,6 @@ import * as ImagePicker from "expo-image-picker";
 import Colors from "../../../constants/Colors";
 import { useDispatch, useSelector } from "react-redux";
 import { BACKEND_URL } from "../../../env";
-import { GEMINI_API_KEY } from "../../../env";
 import { storeReels, storeRefreshUser } from "../../../store/user.js";
 import { Image } from "react-native";
 import { Video } from "expo-av";
@@ -126,7 +125,7 @@ export default function CreateReel() {
 
         {loaderSelecting ? (
           <View style={styles.mediaBox}>
-            <ActivityIndicator size="large" color={Colors.red} />
+            <ActivityIndicator size="large" color={Colors.primary} />
             <Text style={styles.mediaText}>Opening Gallery</Text>
           </View>
         ) : media ? (
@@ -165,6 +164,7 @@ export default function CreateReel() {
         <CatButton
           text="Upload"
           loading={isUploading}
+          fontFamily={"Bold"}
           onPress={uploadMedia}
           width={"100%"}
         />
@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
     width: 30,
     resizeMode: "contain",
   },
+
   aiText: {
     color: Colors.black,
     fontSize: 14,
@@ -242,9 +243,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mediaText: {
-    fontSize: 20,
-    fontWeight: "Regular",
-    color: Colors.black,
+    fontSize: 18,
+    fontFamily: "Regular",
+    color: Colors.darkGrey,
   },
   uploadBtn: {
     backgroundColor: Colors.red,

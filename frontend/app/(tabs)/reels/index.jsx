@@ -45,11 +45,11 @@ const Reels = () => {
   let currentStart = 0;
   const FETCH_REELS_LIMIT = 5;
 
-  async function getData() {
+  async function getData(shuffle = true) {
     setReelsLoader(true);
 
     const response = await fetch(
-      `${BACKEND_URL}/getAllReels?start=${currentStart}&limit=${FETCH_REELS_LIMIT}`
+      `${BACKEND_URL}/getAllReels?start=${currentStart}&limit=${FETCH_REELS_LIMIT}&shuffle=${shuffle}`
     );
     const fetchData = await response.json();
 
@@ -72,7 +72,7 @@ const Reels = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     setData([]);
-    await getData();
+    await getData(true);
     setRefreshing(false);
   };
 

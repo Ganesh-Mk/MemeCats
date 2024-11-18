@@ -16,6 +16,7 @@ import { BACKEND_URL } from "../../../env";
 import { useSelector } from "react-redux";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import VideoModal from "../../../components/VideoModel";
+import { Path, Svg } from "react-native-svg";
 
 const SavedReel = ({ email }) => {
   const [savedReels, setSavedReels] = useState([]);
@@ -26,6 +27,7 @@ const SavedReel = ({ email }) => {
   const [buttonLoader, setButtonLoader] = useState(false);
   const [reelIdToDelete, setReelIdToDelete] = useState(null);
   const [selectedReel, setSelectedReel] = useState(null); // Store selected user details
+  const [hasError, setHasError] = useState(false);
 
   const user = useSelector((state) => state.user);
   const fetchUser = async () => {
@@ -118,7 +120,16 @@ const SavedReel = ({ email }) => {
           description={selectedReel.desc}
         />
       )}
-      <Text style={styles.headerText}>Meow-ments You've Saved</Text>
+      {savedReels.length !== 0 && (
+        <View style={styles.headerContainer}>
+          <Image
+            source={require("../../../assets/images/memeCats/likeCat.png")}
+            style={styles.likeCat}
+          />
+          <Text style={styles.headerText}>Meow-ments You've Saved</Text>
+        </View>
+      )}
+
       {loader ? (
         <ActivityIndicator
           size="large"
@@ -142,27 +153,63 @@ const SavedReel = ({ email }) => {
           contentContainerStyle={styles.reelGrid}
           refreshing={loader}
           onRefresh={() => fetchUser()}
-          renderItem={({ item }) => (
-            <View style={styles.reelWrapper}>
-              <TouchableOpacity
-                style={styles.reelContainer}
-                onPress={() => openModal(item)}
-              >
-                <Video
-                  source={{ uri: item.reelUrl }}
-                  style={styles.reelVideo}
-                  resizeMode="contain"
-                  onError={() => console.log("video error")}
-                />
-                <View style={styles.reelButtonsBox}>
-                  <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>
-                  <TouchableOpacity onPress={() => confirmDeleteReel(item._id)}>
-                    <AntDesign name="delete" size={20} color="red" />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            return (
+              <View style={styles.reelWrapper}>
+                <TouchableOpacity
+                  style={styles.reelContainer}
+                  onPress={() => openModal(item)}
+                >
+                  {!hasError ? (
+                    <Video
+                      source={{ uri: item.reelUrl }}
+                      style={styles.reelVideo}
+                      resizeMode="contain"
+                      onError={() => setHasError(true)}
+                    />
+                  ) : (
+                    <View style={styles.errorTextContainer}>
+                      <Text style={styles.errorText}>
+                        Something went wrong!
+                      </Text>
+                      <Text style={[styles.errorText, { marginTop: 10 }]}>
+                        Restart app
+                      </Text>
+                    </View>
+                  )}
+                  <View style={styles.reelButtonsBox}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 5,
+                      }}
+                    >
+                      <Svg
+                        height={15}
+                        width={20}
+                        viewBox="0 0 512 512"
+                        xmlSpace="preserve"
+                      >
+                        <Path
+                          d="M474.655,74.503C449.169,45.72,413.943,29.87,375.467,29.87c-30.225,0-58.5,12.299-81.767,35.566 c-15.522,15.523-28.33,35.26-37.699,57.931c-9.371-22.671-22.177-42.407-37.699-57.931c-23.267-23.267-51.542-35.566-81.767-35.566 c-38.477,0-73.702,15.851-99.188,44.634C13.612,101.305,0,137.911,0,174.936c0,44.458,13.452,88.335,39.981,130.418 c21.009,33.324,50.227,65.585,86.845,95.889c62.046,51.348,123.114,78.995,125.683,80.146c2.203,0.988,4.779,0.988,6.981,0 c2.57-1.151,63.637-28.798,125.683-80.146c36.618-30.304,65.836-62.565,86.845-95.889C498.548,263.271,512,219.394,512,174.936 C512,137.911,498.388,101.305,474.655,74.503z"
+                          fill={Colors.red}
+                          stroke={Colors.red}
+                          strokeWidth="50"
+                        />
+                      </Svg>
+                      <Text style={styles.likes}>{item.totalLikes}</Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => confirmDeleteReel(item._id)}
+                    >
+                      <AntDesign name="delete" size={20} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
+          }}
         />
       )}
       <ConfirmationModal
@@ -183,13 +230,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightPink,
     padding: 20,
+    paddingTop: 10,
   },
   headerText: {
     fontSize: 25,
     fontWeight: "bold",
     color: Colors.darkText,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   reelWrapper: {
     width: "50%",
@@ -201,6 +249,15 @@ const styles = StyleSheet.create({
   noReelsImage: {
     width: 200,
     height: 200,
+    resizeMode: "contain",
+  },
+  headerContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  likeCat: {
+    height: 130,
+    width: 130,
     resizeMode: "contain",
   },
   noReelsContainer: {
@@ -224,6 +281,20 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 230,
     borderRadius: 10,
+  },
+  errorTextContainer: {
+    width: "100%",
+    height: 230,
+    borderRadius: 10,
+    backgroundColor: Colors.lightGrey,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorText: {
+    fontFamily: "Regular",
+    fontSize: 16,
+    textAlign: "center",
+    color: Colors.black,
   },
   reelButtonsBox: {
     flexDirection: "row",

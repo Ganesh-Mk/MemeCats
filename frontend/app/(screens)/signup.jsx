@@ -25,6 +25,7 @@ import { BACKEND_URL } from "../../env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import { Ionicons } from "@expo/vector-icons";
+import CatButton from "../../components/CatButton";
 
 const Signup = () => {
   const dispatch = useDispatch();
@@ -45,6 +46,12 @@ const Signup = () => {
     if (!name || !email || !password) {
       setModalVisible(true);
       setModalMessage("You dumb! Fill all the fields");
+      return;
+    }
+
+    if (email && !email.includes("@")) {
+      setModalVisible(true);
+      setModalMessage(`${email} - is this really an email? `);
       return;
     }
 
@@ -97,7 +104,7 @@ const Signup = () => {
       <ConfirmationModal
         visible={isModalVisible}
         message={modalMessage}
-        button={"Oh Okay"}
+        button={"Ohh! Sorry Sorry"}
         onConfirm={() => setModalVisible(false)}
       />
       <View style={styles.screen}>
@@ -144,17 +151,13 @@ const Signup = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.btnBox}
+        <CatButton
+          fontFamily={"Bold"}
+          loading={loading}
+          text="Submit Meow!"
+          fontSize={25}
           onPress={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color={Colors.white} size="large" />
-          ) : (
-            <Text style={styles.btnText}>Submit Meow!</Text>
-          )}
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   );

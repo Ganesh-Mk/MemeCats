@@ -28,6 +28,7 @@ import ConfirmationModal from "../../../components/ConfirmationModal";
 import { setRefreshTogglePlayPause } from "../../../store/reel";
 import CatButton from "../../../components/CatButton";
 import VideoModal from "../../../components/VideoModel";
+import { Path, Svg } from "react-native-svg";
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function AccountScreen() {
   const [refreshReels, setRefreshReels] = useState(0);
   const [name, setName] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [hasError, setHasError] = useState(false);
   const [reels, setReels] = useState([]);
   const [reelsLoader, setReelsLoader] = useState(false);
   const [videoModalVisible, setVideoModalVisible] = useState(false);
@@ -238,13 +240,43 @@ export default function AccountScreen() {
               style={styles.reelContainer}
               onPress={() => openModal(item)}
             >
-              <Video
-                source={{ uri: item.reelUrl }}
-                style={styles.reelVideo}
-                resizeMode="contain"
-              />
+              {!hasError ? (
+                <Video
+                  source={{ uri: item.reelUrl }}
+                  style={styles.reelVideo}
+                  resizeMode="contain"
+                />
+              ) : (
+                <View style={styles.errorTextContainer}>
+                  <Text style={styles.errorText}>Something went wrong!</Text>
+                  <Text style={[styles.errorText, { marginTop: 10 }]}>
+                    Restart app
+                  </Text>
+                </View>
+              )}
               <View style={styles.reelButtonsBox}>
-                <Text style={styles.likeCount}>💖 {item.totalLikes}</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 5,
+                  }}
+                >
+                  <Svg
+                    height={15}
+                    width={20}
+                    viewBox="0 0 512 512"
+                    xmlSpace="preserve"
+                  >
+                    <Path
+                      d="M474.655,74.503C449.169,45.72,413.943,29.87,375.467,29.87c-30.225,0-58.5,12.299-81.767,35.566 c-15.522,15.523-28.33,35.26-37.699,57.931c-9.371-22.671-22.177-42.407-37.699-57.931c-23.267-23.267-51.542-35.566-81.767-35.566 c-38.477,0-73.702,15.851-99.188,44.634C13.612,101.305,0,137.911,0,174.936c0,44.458,13.452,88.335,39.981,130.418 c21.009,33.324,50.227,65.585,86.845,95.889c62.046,51.348,123.114,78.995,125.683,80.146c2.203,0.988,4.779,0.988,6.981,0 c2.57-1.151,63.637-28.798,125.683-80.146c36.618-30.304,65.836-62.565,86.845-95.889C498.548,263.271,512,219.394,512,174.936 C512,137.911,498.388,101.305,474.655,74.503z"
+                      fill={Colors.red}
+                      stroke={Colors.red}
+                      strokeWidth="50"
+                    />
+                  </Svg>
+                  <Text style={styles.likes}>{item.totalLikes}</Text>
+                </View>
                 <TouchableOpacity onPress={() => confirmDeleteReel(item._id)}>
                   <AntDesign name="delete" size={20} color="red" />
                 </TouchableOpacity>
@@ -273,6 +305,20 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginTop: 50,
   },
+  errorTextContainer: {
+    width: "100%",
+    height: 230,
+    borderRadius: 10,
+    backgroundColor: Colors.lightGrey,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorText: {
+    fontFamily: "Regular",
+    fontSize: 16,
+    textAlign: "center",
+    color: Colors.black,
+  },
   noReelsText: {
     fontSize: 20,
     fontFamily: "Bold",
@@ -298,6 +344,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    shadowColor: Colors.lightBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    elevation: 5,
+    borderRadius: 60,
   },
   profileImage: {
     width: 120,
@@ -327,15 +379,19 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: Colors.darkText,
     marginBottom: 5,
+    fontFamily: "Bold",
   },
 
   email: {
     fontSize: 18,
     color: Colors.subtleText,
     marginBottom: 5,
+    fontFamily: "Regular",
   },
   reelCount: {
     fontSize: 18,
+    fontFamily: "Regular",
+
     color: Colors.darkPink,
   },
   buttonContainer: {
@@ -362,10 +418,18 @@ const styles = StyleSheet.create({
   },
   btnBox: {
     backgroundColor: Colors.red,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    shadowColor: "#000", // shadow effect
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+    height: 44,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
-    height: 44,
   },
   btnText: {
     fontFamily: "Regular",
