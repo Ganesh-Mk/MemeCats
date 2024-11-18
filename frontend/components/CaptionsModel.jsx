@@ -60,7 +60,6 @@ export default function CaptionsModel({ visible, onSelect, closeModel }) {
   };
 
   const handleAI = async () => {
-    console.log("handle AI");
     setLoader(true);
     try {
       const response = await fetch(`${BACKEND_URL}/getAIResponse`, {
@@ -74,7 +73,6 @@ export default function CaptionsModel({ visible, onSelect, closeModel }) {
       const data = await response.json();
       if (response.ok) {
         setCaptions(data.captions);
-        console.log(data);
       } else {
         Alert.alert("Upload Failed", data.message, [{ text: "OK" }]);
       }

@@ -11,8 +11,6 @@ router.get("/getComments", async (req, res) => {
       "comment name profileImage"
     );
 
-    console.log("Came to comments with id: " + reelId);
-
     if (reel) {
       return res.status(200).send(reel.comments);
     } else {

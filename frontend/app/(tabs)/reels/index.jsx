@@ -40,6 +40,7 @@ const Reels = () => {
   const [reelsLoader, setReelsLoader] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
   const [reelCommentId, setReelCommentId] = useState([]);
+  const [refreshCommentLength, setRefreshCommentLength] = useState(0);
   const [commentsModelVisible, setCommentsModelVisible] = useState(false);
   let currentStart = 0;
   const FETCH_REELS_LIMIT = 5;
@@ -268,6 +269,7 @@ const Reels = () => {
             openCommentsModal={() => openCommentsModal(item._id)}
             closeCommentsModal={closeCommentsModal}
             toggleMute={toggleMute}
+            refreshCommentLength={refreshCommentLength}
             muted={muted}
             reel={item}
             index={index}
@@ -292,7 +294,6 @@ const Reels = () => {
     setCommentsModelVisible(false);
   };
   const openCommentsModal = (reelId) => {
-    console.log("ReelComments", reelId);
     setReelCommentId(reelId);
     setCommentsModelVisible(true);
   };
@@ -316,6 +317,9 @@ const Reels = () => {
       {commentsModelVisible && (
         <CommentModels
           reelId={reelCommentId}
+          setRefreshCommentLength={() =>
+            setRefreshCommentLength((prev) => prev + 1)
+          }
           closeCommentsModal={closeCommentsModal}
         />
       )}

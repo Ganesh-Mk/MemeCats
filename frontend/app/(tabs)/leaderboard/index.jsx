@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { BACKEND_URL } from "../../../env";
 import VideoModal from "../../../components/VideoModel";
@@ -52,7 +53,7 @@ const Leaderboard = () => {
         setRankFinished(true);
       }
     } catch (error) {
-      console.log("Error fetching ranking data/Finished", error);
+      Alert.alert("Error while fetching ranking data", error.message);
     } finally {
       setLoading(false);
     }

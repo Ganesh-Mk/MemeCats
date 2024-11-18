@@ -8,19 +8,41 @@ import {
   Dimensions,
   Image,
   TextInput,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Colors from "../constants/Colors";
 import { BACKEND_URL } from "../env";
 import { useSelector } from "react-redux";
+import ConfirmationModal from "./ConfirmationModal";
 
-const CommentModels = ({ isVisible, reelId, closeCommentsModal }) => {
+const CommentModels = ({
+  isVisible,
+  reelId,
+  closeCommentsModal,
+  setRefreshCommentLength,
+}) => {
   const [comments, setComments] = useState([]);
   const [input, setInput] = useState("");
+  const [loader, setLoader] = useState(false);
+  const [commentLoader, setCommentLoader] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  const [isModalVisible, setModalVisible] = useState(false);
+
   const user = useSelector((state) => state.user);
 
   const handleComment = async () => {
-    console.log("Commenting...", input, reelId);
+    if (!input || !input.trim()) {
+      setModalVisible(true);
+      setModalMessage(
+        "Am I supposed to read your mind now? You can't post empty comment, human."
+      );
+      return;
+    }
+
+    setLoader(true);
     try {
       const response = await fetch(`${BACKEND_URL}/comment`, {
         method: "POST",
@@ -37,19 +59,20 @@ const CommentModels = ({ isVisible, reelId, closeCommentsModal }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("After comment: ", data);
         setComments(data);
+        setRefreshCommentLength();
         setInput("");
       }
     } catch (err) {
-      console.log(err);
+      Alert.alert("Error while posting comment", err.message);
+    } finally {
+      setLoader(false);
     }
   };
 
   useEffect(() => {
-    console.log("reelId", reelId);
     const fetchComments = async () => {
-      console.log("Fetching comments....");
+      setCommentLoader(true);
       try {
         const response = await fetch(
           `${BACKEND_URL}/getComments?reelId=${reelId}`
@@ -57,10 +80,11 @@ const CommentModels = ({ isVisible, reelId, closeCommentsModal }) => {
         if (response.ok) {
           const data = await response.json();
           setComments(data);
-          console.log("got commments, ", data);
         }
       } catch (err) {
-        console.log(err);
+        Alert.alert("Error while fetching comments", err.message);
+      } finally {
+        setCommentLoader(false);
       }
     };
     fetchComments();
@@ -73,6 +97,12 @@ const CommentModels = ({ isVisible, reelId, closeCommentsModal }) => {
       visible={isVisible}
       onRequestClose={closeCommentsModal}
     >
+      <ConfirmationModal
+        visible={isModalVisible}
+        message={modalMessage}
+        button={"Oh Okay"}
+        onConfirm={() => setModalVisible(false)}
+      />
       <View style={styles.modalOverlay}>
         <View style={styles.commentsSection}>
           <View style={styles.commentHeader}>
@@ -99,7 +129,13 @@ const CommentModels = ({ isVisible, reelId, closeCommentsModal }) => {
             showsVerticalScrollIndicator={true}
             style={styles.commentsList}
             contentContainerStyle={styles.commentsContainer}
+            ListFooterComponent={
+              commentLoader ? (
+                <ActivityIndicator color="white" size="large" />
+              ) : null
+            }
           />
+
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Write comment..."
@@ -109,10 +145,14 @@ const CommentModels = ({ isVisible, reelId, closeCommentsModal }) => {
               style={styles.input}
             />
             <TouchableOpacity onPress={handleComment}>
-              <Image
-                source={require("../assets/images/send.png")}
-                style={styles.sendIcon}
-              />
+              {loader ? (
+                <ActivityIndicator size="large" color="white" />
+              ) : (
+                <Image
+                  source={require("../assets/images/send.png")}
+                  style={styles.sendIcon}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -132,7 +172,7 @@ const styles = StyleSheet.create({
   },
   commentsSection: {
     width: Dimensions.get("window").width - 30,
-    height: 500,
+    height: 400,
     backgroundColor: Colors.darkTransparent,
     borderRadius: 20,
     overflow: "hidden",
@@ -140,9 +180,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     padding: 15,
     borderTopWidth: 1,
     borderTopColor: "#444",
+    gap: 10,
   },
   input: {
     flex: 1,
@@ -183,6 +225,7 @@ const styles = StyleSheet.create({
   closeButton: {
     color: "white",
     fontSize: 20,
+    fontFamily: "Bold",
     padding: 5,
   },
   commentsList: {
