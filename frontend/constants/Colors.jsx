@@ -9,6 +9,8 @@ const Colors = {
   lightGrey: "#e9ecef",
   darkGrey: "#6c757d",
   black: "#000",
+  lightTransparent: "rgba(0, 0, 0, 0.2)",
+  darkTransparent: "rgba(0, 0, 0, 0.7)",
 };
 
 export default Colors;

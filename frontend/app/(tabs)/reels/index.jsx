@@ -19,6 +19,7 @@ import CommentsOverlay from "../../../components/CommentsOverlay";
 import PlayPauseIcon from "../../../components/Icons/PlayPauseIcon";
 import Colors from "../../../constants/Colors";
 import ActiveLikedIcon from "../../../components/Icons/ActiveLikedIcon";
+import CommentModels from "../../../components/CommentModel";
 
 const { height: screenHeight } = Dimensions.get("window");
 const viewabilityConfig = {
@@ -38,6 +39,8 @@ const Reels = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [reelsLoader, setReelsLoader] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
+  const [reelCommentId, setReelCommentId] = useState([]);
+  const [commentsModelVisible, setCommentsModelVisible] = useState(false);
   let currentStart = 0;
   const FETCH_REELS_LIMIT = 5;
 
@@ -262,7 +265,8 @@ const Reels = () => {
             handleReelLiked={() => handleReelLiked(item)}
             handleReelLikeRemoved={() => handleReelLikeRemoved(item)}
             handleReelSave={() => handleReelSave(item._id)}
-            openCommentsModal={handleReelComments}
+            openCommentsModal={() => openCommentsModal(item._id)}
+            closeCommentsModal={closeCommentsModal}
             toggleMute={toggleMute}
             muted={muted}
             reel={item}
@@ -284,21 +288,38 @@ const Reels = () => {
     );
   };
 
+  const closeCommentsModal = () => {
+    setCommentsModelVisible(false);
+  };
+  const openCommentsModal = (reelId) => {
+    console.log("ReelComments", reelId);
+    setReelCommentId(reelId);
+    setCommentsModelVisible(true);
+  };
+
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item, index) => `${item._id}-${index}`}
-      renderItem={renderItem}
-      snapToInterval={screenHeight * 1.0}
-      decelerationRate="fast"
-      pagingEnabled
-      showsVerticalScrollIndicator={false}
-      onViewableItemsChanged={handleViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
-      contentContainerStyle={styles.contentContainerStyle}
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-    />
+    <View>
+      <FlatList
+        data={data}
+        keyExtractor={(item, index) => `${item._id}-${index}`}
+        renderItem={renderItem}
+        snapToInterval={screenHeight * 1.0}
+        decelerationRate="fast"
+        pagingEnabled
+        showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={handleViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        contentContainerStyle={styles.contentContainerStyle}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+      />
+      {commentsModelVisible && (
+        <CommentModels
+          reelId={reelCommentId}
+          closeCommentsModal={closeCommentsModal}
+        />
+      )}
+    </View>
   );
 };
 

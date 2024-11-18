@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema({
-  text: {
+  comment: {
     type: String,
     required: true,
   },
@@ -12,10 +12,6 @@ const commentSchema = new mongoose.Schema({
   profileImage: {
     type: String,
     required: true,
-  },
-  likes: {
-    type: Number,
-    default: 0,
   },
 });
 

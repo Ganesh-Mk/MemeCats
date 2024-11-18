@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet, Image, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import LikeIcon from "./Icons/LikeIcon";
 import SaveIcon from "./Icons/SaveIcon";
@@ -10,6 +10,7 @@ const RightOverlay = ({
   handleReelLikeRemoved,
   handleReelSave,
   toggleMute,
+  openCommentsModal,
   muted,
   reel,
   index,
@@ -23,14 +24,16 @@ const RightOverlay = ({
           handleReelLikeRemoved={handleReelLikeRemoved}
         />
       </Pressable>
-      {/* <Pressable style={styles.iconButton}>
-        <Icon
-          name="comment"
-          onPress={() => openCommentsModal(reel)}
-          size={30}
-          color="white"
+      <Pressable
+        onPress={() => openCommentsModal(reel)}
+        style={styles.commentContainer}
+      >
+        <Image
+          style={styles.commentIcon}
+          source={require("../assets/images/comment.png")}
         />
-      </Pressable> */}
+        <Text style={styles.commentText}>452</Text>
+      </Pressable>
       <Pressable style={styles.iconButton}>
         <SaveIcon reel={reel} handleReelSaved={handleReelSave} />
       </Pressable>
@@ -51,6 +54,17 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginVertical: 10,
+  },
+
+  commentIcon: {
+    width: 40,
+    height: 40,
+  },
+  commentText: {
+    color: "white",
+    fontFamilty: "Bold",
+    textAlign: "center",
+    marginBottom: 5,
   },
 });
 

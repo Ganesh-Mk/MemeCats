@@ -215,7 +215,7 @@ export default function AccountScreen() {
       </View>
       <Text style={styles.headerText}>Reels</Text>
 
-      {reels.length === 0 && (
+      {!reelsLoader && reels.length === 0 && (
         <View style={styles.noReelsContainer}>
           <Image
             source={require("../../../assets/images/memeCats/sideEyeCat1.gif")}

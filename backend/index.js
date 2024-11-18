@@ -29,6 +29,8 @@ const saveReelRouter = require("./routes/saveReel");
 const deleteSavedReelRouter = require("./routes/deleteSavedReel");
 const getRankingRouter = require("./routes/getRanking");
 const getAIResponseRouter = require("./routes/getAIResponse");
+const getCommentsRouter = require("./routes/getComments");
+const commentRouter = require("./routes/comment");
 
 app.use(signupRouter);
 app.use(loginRouter);
@@ -44,6 +46,8 @@ app.use(saveReelRouter);
 app.use(deleteSavedReelRouter);
 app.use(getRankingRouter);
 app.use(getAIResponseRouter);
+app.use(getCommentsRouter);
+app.use(commentRouter);
 
 const User = require("./models/userModel");
 
@@ -78,6 +82,7 @@ app.get("/getReel", getReelRouter);
 app.get("/delete", deleteRouter);
 app.get("/getUser", getUserRouter);
 app.get("/getRanking", getRankingRouter);
+app.get("/getComments", getCommentsRouter);
 
 app.post("/signup", signupRouter);
 app.post("/login", loginRouter);
@@ -85,6 +90,7 @@ app.post("/createReel", createReelRouter);
 app.post("/updateReelLikes", updateReelLikesRouter);
 app.post("/saveReel", saveReelRouter);
 app.post("/getAIResponse", getAIResponseRouter);
+app.post("/comment", commentRouter);
 
 app.patch("/editProfile", editProfileRouter);
 
