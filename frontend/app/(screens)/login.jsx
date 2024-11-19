@@ -63,7 +63,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("../(tabs)/reels");
+        router.push("../(tabs)/account");
 
         dispatch(storeId(data.user._id));
         dispatch(storeName(data.user.name));

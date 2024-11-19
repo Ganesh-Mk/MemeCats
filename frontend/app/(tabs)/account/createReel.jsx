@@ -19,6 +19,7 @@ import { Video } from "expo-av";
 import { router } from "expo-router";
 import CatButton from "../../../components/CatButton";
 import CaptionsModel from "../../../components/CaptionsModel";
+import ConfirmationModal from "../../../components/ConfirmationModal";
 
 export default function CreateReel() {
   const [media, setMedia] = useState(null); // holds the image or video URI
@@ -30,6 +31,8 @@ export default function CreateReel() {
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [buttonLoader, setButtonLoader] = useState(false);
+  const [confirmationModelVisible, setConfirmationModelVisible] =
+    useState(false);
   const [modalMessage, setModalMessage] = useState("");
 
   const pickMedia = async () => {
@@ -93,9 +96,10 @@ export default function CreateReel() {
         Alert.alert("Upload Failed", data.message, [{ text: "OK" }]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to upload. Try smaller size media", [
-        { text: "OK" },
-      ]);
+      setConfirmationModelVisible(true);
+      setModalMessage(
+        "Ahhh! Video size is big for free database or network issue😿 Try using smaller size video"
+      );
     } finally {
       setIsUploading(false);
     }
@@ -119,6 +123,12 @@ export default function CreateReel() {
         visible={isModalVisible}
         closeModel={closeAIModel}
         onSelect={(cap) => setDesc(cap)}
+      />
+      <ConfirmationModal
+        visible={confirmationModelVisible}
+        message={modalMessage}
+        button={"Oh Okay"}
+        onConfirm={() => setConfirmationModelVisible(false)}
       />
       <View style={styles.container}>
         <Text style={styles.headerText}>Hey Hooman, make me famous! 🐱</Text>

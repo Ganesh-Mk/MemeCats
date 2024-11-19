@@ -32,7 +32,7 @@ const sortReels = (reels) => {
 
 router.get("/getAllReels", async (req, res) => {
   try {
-    const { start = 0, limit = 5, shuffle } = req.query;
+    const { start = 0, limit = 4, shuffle } = req.query;
     let reels = await Reel.find().populate("user", "name profileImage");
 
     if (reels && reels.length > 0) {

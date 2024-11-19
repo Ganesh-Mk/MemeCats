@@ -259,8 +259,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
-    gap: 30,
-    marginLeft: 0,
+    gap: 20,
     marginLeft: 10,
   },
   email: {
@@ -269,10 +268,10 @@ const styles = StyleSheet.create({
     color: Colors.darkGrey,
   },
   likes: {
-    fontSize: 18,
+    fontSize: 15,
     fontFamily: "Regular",
     color: Colors.darkPink,
-    width: 25,
+    width: 30,
     textAlign: "center",
   },
 });

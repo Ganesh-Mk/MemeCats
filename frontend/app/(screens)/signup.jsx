@@ -85,7 +85,7 @@ const Signup = () => {
           console.error("Error saving data on signup", error);
         }
 
-        router.push("../(tabs)/reels");
+        router.push("../(tabs)/account");
       } else {
         setModalVisible(true);
         setModalMessage("Email Already Exists, Try using another Email");

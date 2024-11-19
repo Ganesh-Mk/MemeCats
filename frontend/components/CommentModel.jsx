@@ -115,10 +115,18 @@ const CommentModels = ({
             data={comments}
             renderItem={({ item }) => (
               <View style={styles.commentItem}>
-                <Image
-                  style={styles.commentUserImage}
-                  source={require("../assets/images/memeCats/noProfileImage.png")}
-                />
+                {item.profileImage ? (
+                  <Image
+                    style={styles.commentUserImage}
+                    source={{ uri: item.profileImage }}
+                  />
+                ) : (
+                  <Image
+                    style={styles.commentUserImage}
+                    source={require("../assets/images/memeCats/noProfileImage.png")}
+                  />
+                )}
+
                 <View style={styles.commentContent}>
                   <Text style={styles.commentUser}>{item.name}</Text>
                   <Text style={styles.commentText}>{item.comment}</Text>

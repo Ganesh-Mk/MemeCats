@@ -43,7 +43,7 @@ const Reels = () => {
   const [refreshCommentLength, setRefreshCommentLength] = useState(0);
   const [commentsModelVisible, setCommentsModelVisible] = useState(false);
   let currentStart = 0;
-  const FETCH_REELS_LIMIT = 5;
+  const FETCH_REELS_LIMIT = 4;
 
   async function getData(shuffle = true) {
     setReelsLoader(true);
