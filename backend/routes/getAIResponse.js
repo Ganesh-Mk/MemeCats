@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+require("dotenv").config();
 
 const addOnPrompt = `
 You are a Cat Meme Caption Generator AI. You will receive a user prompt and generate five short, humorous, and meme-worthy captions related to cats. Each caption should be funny, witty, or relatable, reflecting typical meme humor. Return the captions as an array of strings.
@@ -22,9 +23,8 @@ router.post("/getAIResponse", async (req, res) => {
   const { prompt } = req.body;
 
   const { GoogleGenerativeAI } = require("@google/generative-ai");
-  const genAI = new GoogleGenerativeAI(
-    "AIzaSyBT0T1a9eItu0-MQaRG-AQZnR_MYaEB66c"
-  );
+  const genAI = new GoogleGenerativeAI(process.env.GEN_AI_API_KEY);
+
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   const result = await model.generateContent(addOnPrompt + prompt);
   const responseText = result.response.text();

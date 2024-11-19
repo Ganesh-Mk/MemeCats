@@ -44,6 +44,8 @@ const styles = StyleSheet.create({
   username: {
     color: "white",
     fontSize: 18,
+    flexWrap: "wrap",
+    width: 200,
     fontWeight: "bold",
   },
   descContainer: {

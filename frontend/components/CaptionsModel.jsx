@@ -14,12 +14,16 @@ import {
 } from "react-native";
 import Colors from "../constants/Colors";
 import { BACKEND_URL } from "../env";
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function CaptionsModel({ visible, onSelect, closeModel }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const [captions, setCaptions] = useState([]);
   const [desc, setDesc] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
@@ -77,9 +81,10 @@ export default function CaptionsModel({ visible, onSelect, closeModel }) {
         Alert.alert("Upload Failed", data.message, [{ text: "OK" }]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to Generate from AI, Add caption yourself", [
-        { text: "OK" },
-      ]);
+      setModalVisible(true);
+      setModalMessage(
+        "AI is stuck in traffic! Free model struggles, Try again later!"
+      );
     } finally {
       setLoader(false);
     }
@@ -87,6 +92,13 @@ export default function CaptionsModel({ visible, onSelect, closeModel }) {
 
   return (
     <Modal transparent visible={visible} animationType="fade">
+      <ConfirmationModal
+        visible={isModalVisible}
+        message={modalMessage}
+        button={"Oh Alright!"}
+        catImage={"okCat"}
+        onConfirm={() => setModalVisible(false)}
+      />
       <View style={styles.modalOverlay}>
         <Animated.View
           style={[

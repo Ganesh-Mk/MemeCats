@@ -153,9 +153,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightGrey,
   },
   headerText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 70,
+    fontSize: 30,
+    fontFamily: "Regular",
+    marginBottom: 20,
     textAlign: "center",
   },
   input: {

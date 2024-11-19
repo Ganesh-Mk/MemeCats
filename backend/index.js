@@ -22,7 +22,6 @@ const createReelRouter = require("./routes/createReel");
 const getAllReelsRouter = require("./routes/getAllReels");
 const getReelRouter = require("./routes/getReel");
 const deleteReelRouter = require("./routes/deleteReel");
-const deleteRouter = require("./routes/delete");
 const getUserRouter = require("./routes/getUser");
 const updateReelLikesRouter = require("./routes/updateReelLikes");
 const saveReelRouter = require("./routes/saveReel");
@@ -39,7 +38,6 @@ app.use(createReelRouter);
 app.use(getAllReelsRouter);
 app.use(getReelRouter);
 app.use(deleteReelRouter);
-app.use(deleteRouter);
 app.use(getUserRouter);
 app.use(updateReelLikesRouter);
 app.use(saveReelRouter);
@@ -59,26 +57,12 @@ mongoose
   .catch((err) => console.error("Database Connection Failed: ", err));
 
 app.get("/", async (req, res) => {
-  // const users = await User.find().populate("reels");
-  // res.json(users);
-  // res.send("Hello World!");
-
-  const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-  const genAI = new GoogleGenerativeAI(
-    "AIzaSyBT0T1a9eItu0-MQaRG-AQZnR_MYaEB66c"
-  );
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const prompt = "Explain how AI works";
-
-  const result = await model.generateContent(prompt);
-  res.send("Hello World!");
+  const users = await User.find().populate("reels");
+  res.json(users);
 });
 
 app.get("/getAllReels", getAllReelsRouter);
 app.get("/getReel", getReelRouter);
-app.get("/delete", deleteRouter);
 app.get("/getUser", getUserRouter);
 app.get("/getRanking", getRankingRouter);
 app.get("/getComments", getCommentsRouter);

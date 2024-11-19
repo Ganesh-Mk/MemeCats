@@ -234,10 +234,9 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 25,
-    fontWeight: "bold",
-    color: Colors.darkText,
-    textAlign: "center",
+    fontFamily: "Regular",
     marginBottom: 10,
+    textAlign: "center",
   },
   reelWrapper: {
     width: "50%",

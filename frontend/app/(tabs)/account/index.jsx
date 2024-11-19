@@ -344,12 +344,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
-    shadowColor: Colors.lightBlue,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 5,
-    borderRadius: 60,
   },
   profileImage: {
     width: 120,

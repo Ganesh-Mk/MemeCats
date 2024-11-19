@@ -19,6 +19,7 @@ export default function ConfirmationModal({
   onCancel,
   loader,
   button,
+  catImage = null,
 }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
@@ -69,10 +70,18 @@ export default function ConfirmationModal({
             { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
           ]}
         >
-          <Image
-            source={require("../assets/images/memeCats/sideEyeCat2.png")}
-            style={styles.noReelsImage}
-          />
+          {catImage && catImage === "okCat" ? (
+            <Image
+              source={require("../assets/images/memeCats/okCat.png")}
+              style={styles.noReelsImage}
+            />
+          ) : (
+            <Image
+              source={require("../assets/images/memeCats/sideEyeCat2.png")}
+              style={styles.noReelsImage}
+            />
+          )}
+
           <Text style={styles.modalText}>{message}</Text>
           {button ? (
             <TouchableOpacity

@@ -181,8 +181,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 32,
-    fontWeight: "bold",
+    fontSize: 30,
+    fontFamily: "Regular",
     marginBottom: 20,
     textAlign: "center",
   },

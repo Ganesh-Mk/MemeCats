@@ -148,6 +148,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "bold",
+    flexWrap: "wrap",
+    width: 170,
     color: Colors.white,
   },
   cancelIcon: {
