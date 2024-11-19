@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 
 router.post("/login", async (req, res) => {
@@ -9,8 +10,10 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email }).populate("reels");
 
     if (user) {
-      if (user.password === password) {
-        res.status(200).send({ message: "Login Successful", user: user });
+      // Compare hashed password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) {
+        res.status(200).send({ message: "Login Successful", user });
       } else {
         res.status(401).send({ message: "Password didn't match" });
       }

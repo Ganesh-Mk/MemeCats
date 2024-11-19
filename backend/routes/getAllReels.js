@@ -38,6 +38,7 @@ router.get("/getAllReels", async (req, res) => {
     if (reels && reels.length > 0) {
       let allReels = sortReels(reels);
 
+      // Shuffle the reels if user refresh
       if (shuffle === "true") {
         allReels = allReels.sort(() => Math.random() - 0.5);
       }

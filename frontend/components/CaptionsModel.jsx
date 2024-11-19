@@ -83,7 +83,7 @@ export default function CaptionsModel({ visible, onSelect, closeModel }) {
     } catch (error) {
       setModalVisible(true);
       setModalMessage(
-        "AI is stuck in traffic! Free model struggles, Try again later!"
+        "AI is stuck in traffic! 😿 Free model struggles, Try again later!"
       );
     } finally {
       setLoader(false);
