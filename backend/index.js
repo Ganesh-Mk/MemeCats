@@ -1,13 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const path = require("path");
 require("dotenv").config();
 const cors = require("cors");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 const corsOptions = {
   origin: [process.env.FRONTEND_URL, process.env.BACKEND_URL],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
