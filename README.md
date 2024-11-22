@@ -36,7 +36,7 @@ Welcome to **MemeCats**, the ultimate platform for cat lovers to **create**, **s
 ## 📸 **Screenshots:**
 
 <div style="display: flex; justify-content: center; align-items: center;">
-  <img src="https://drive.google.com/file/d/1jP0N4zMuVLm7n1R6TnBDCkldvOF8hDIu/preview" style="max-width: 80%; height: auto;" />
+  <img src="https://res.cloudinary.com/dzvwqfadm/image/upload/v1732286187/wx7y74r9mh3xce4618wv.png" style="max-width: 80%; height: auto;" />
 </div>
 
 ---
