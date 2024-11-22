@@ -19,8 +19,10 @@ router.get("/getRanking", async (req, res) => {
       .populate("user", "name email profileImage")
       .sort({ dailyLikes: -1, totalLikes: -1, createdAt: 1 }); // Sorting by dailyLikes, totalLikes, and createdAt for tie-breaking
 
+    const validReels = reels.filter((reel) => reel.user !== null);
     // Ranking logic to handle same likes scenario
-    const rankedReels = reels.map((reel) => ({
+
+    const rankedReels = validReels.map((reel) => ({
       name: reel.user.name,
       email: reel.user.email,
       profileImage: reel.user.profileImage,
